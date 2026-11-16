@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>FLYLAB — конструктор промптов для игр</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --surface: #151d32;
+      --surface-2: #1c2740;
+      --stroke: #303d58;
+      --text: #f4f6ff;
+      --muted: #9cabc6;
+      --pink: #ff668f;
+      --violet: #9c87ff;
+      --mint: #6ce6d5;
+      --radius: 22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(950px 650px at 9% -15%, #29214d 0, transparent 70%),
+        radial-gradient(950px 620px at 92% 4%, #1b3655 0, transparent 72%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+    .app { max-width: 1470px; padding: 25px clamp(16px, 3.4vw, 52px) 48px; margin: 0 auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: white; font-weight: 900; letter-spacing: -.065em; font-size: 25px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px; background: linear-gradient(135deg, #ff6d9a, #a27afd); color: #15162b; box-shadow: 0 8px 22px #a27afd3c; font-size: 24px; letter-spacing: 0; }
+    .brand span:last-child { color: var(--pink); }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .micro { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    .reset { color: #dbe5fa; background: #ffffff0c; border: 1px solid var(--stroke); padding: 11px 15px; border-radius: 12px; font-weight: 700; transition: background .2s, transform .2s; }
+    .reset:hover { background: #ffffff16; transform: translateY(-1px); }
+    .heading { padding: 35px 0 23px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; color: var(--mint); }
+    .eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+    h1 { font-size: clamp(31px, 4.2vw, 57px); line-height: 1.04; letter-spacing: -.064em; margin: 10px 0 10px; font-weight: 900; }
+    h1 em { font-style: normal; background: linear-gradient(95deg, #ff84ae, #b79cff 62%, #83e4e6); color: transparent; background-clip: text; -webkit-background-clip: text; }
+    .subline { color: var(--muted); font-size: 15px; margin: 0; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(370px, .96fr); gap: 23px; align-items: start; }
+    .panel { border: 1px solid #34415c; background: linear-gradient(165deg, #1b253d 0%, #141c30 100%); box-shadow: 0 15px 50px #02051344; border-radius: var(--radius); overflow: hidden; }
+    .tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--stroke); padding: 8px 10px 0; gap: 3px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { flex: 1 0 auto; padding: 16px 11px; background: transparent; color: var(--muted); border: 0; border-bottom: 3px solid transparent; font-size: 13px; font-weight: 800; white-space: nowrap; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: white; border-bottom-color: var(--pink); }
+    .tab span { margin-right: 5px; }
+    .tab-panel { display: none; padding: 27px 27px 30px; min-height: 475px; }
+    .tab-panel.active { display: block; animation: in .18s ease; }
+    @keyframes in { from { opacity: .5; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .panel-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 25px; }
+    h2 { font-size: 22px; font-weight: 850; letter-spacing: -.04em; margin: 0; }
+    .count { font-size: 12px; color: #94a1bc; border: 1px solid var(--stroke); padding: 6px 9px; border-radius: 8px; }
+    .field { margin: 0 0 23px; min-width: 0; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 750; color: #dbe4f8; margin-bottom: 10px; }
+    .field-note { color: var(--muted); font-size: 12px; font-weight: 500; }
+    .form-input, .form-select { width: 100%; border-radius: 12px; color: #f6f8ff; background: #0d1529; border: 1px solid #35425f; height: 45px; padding: 0 14px; min-width: 0; }
+    .form-input::placeholder { color: #73829e; }
+    .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='15' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m1 1 6.5 6L14 1' fill='none' stroke='%23aebbd8' stroke-width='1.7'/%3E%3C/svg%3E"); background-position: right 15px center; background-repeat: no-repeat; padding-right: 37px; }
+    .form-select option { background: #172038; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .choice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .choice-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .choice { background: #0e172a; border: 1px solid #33415e; color: #bfcbe2; border-radius: 13px; min-height: 70px; padding: 12px 7px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font-weight: 700; font-size: 11px; text-align: center; line-height: 1.2; transition: .18s; }
+    .choice .emoji { font-size: 24px; line-height: 1; }
+    .choice:hover { border-color: #8d81d7; color: white; }
+    .choice.active { border-color: #bd98ff; color: white; background: #977cff20; box-shadow: inset 0 0 0 1px #a98cff50; }
+    .choice.active .emoji { filter: drop-shadow(0 1px 8px #ab87ff67); }
+    /* Пять наглядных стилей вместо неочевидного выпадающего списка. */
+    .choice-grid.style-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .style-choice { min-height: 91px; gap: 9px; }
+    .style-figure { position: relative; display: block; width: 34px; height: 34px; border-radius: 50%; background: #f44356; border: 2px solid #311e42; box-shadow: inset -5px -5px 0 #981b39; }
+    .style-figure::before, .style-figure::after { content: ''; position: absolute; top: 10px; width: 11px; height: 7px; background: white; border-radius: 70% 30% 60% 40%; border: 1px solid #27304b; }
+    .style-figure::before { left: 3px; transform: rotate(13deg); }
+    .style-figure::after { right: 3px; transform: rotate(-13deg) scaleX(-1); }
+    .style--cartoon .style-figure { transform: rotate(-8deg); box-shadow: inset -6px -5px 0 #b52943, 2px 3px 0 #f7bf70; }
+    .style--pixel .style-figure { border-radius: 3px; border-width: 4px; box-shadow: 6px 0 #ad2147, 0 5px #9a2443, -5px -5px #fe6f71; }
+    .style--pixel .style-figure::before, .style--pixel .style-figure::after { border-radius: 0; width: 9px; height: 7px; }
+    .style--neon .style-figure { background: #301330; border: 2px solid #ff4baa; box-shadow: 0 0 13px #f347c5, inset 0 0 12px #8a4cff; }
+    .style--neon .style-figure::before, .style--neon .style-figure::after { background: #aefaff; box-shadow: 0 0 7px #63f8ff; }
+    .style--vector .style-figure { border-radius: 9px; border: 3px solid #ffffff; background: #ee3e58; box-shadow: 0 0 0 2px #303e6b; }
+    .style--vector .style-figure::before, .style--vector .style-figure::after { border-radius: 1px; }
+    .style--3d .style-figure { border: 1px solid #ffcdcf; background: radial-gradient(circle at 22% 20%, #ffd9d0, #ff5773 37%, #b32251 68%, #42133b 95%); box-shadow: 3px 5px 8px #0009; }
+    @media (max-width: 630px) { .choice-grid.style-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } .style-choice { min-height: 82px; padding: 8px 2px; font-size: 9px; } .style-figure { transform: scale(.85); } }
+
+    .swatch-field { display: flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: 12px; background: #10192d; border: 1px solid #35425f; height: 45px; }
+    input[type=color] { cursor: pointer; flex: 0 0 31px; width: 31px; height: 31px; background: transparent; border: 0; padding: 0; }
+    input[type=color]::-webkit-color-swatch-wrapper { padding: 2px; }
+    input[type=color]::-webkit-color-swatch { border: 0; border-radius: 8px; }
+    .hex { font-size: 12px; color: #cbd6ee; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .slider-head .field-label { margin-bottom: 0; }
+    .value { color: #b2f2e7; font-size: 13px; font-weight: 850; font-variant-numeric: tabular-nums; }
+    input[type=range] { appearance: none; width: 100%; height: 6px; border-radius: 99px; background: linear-gradient(90deg, var(--pink) 0%, #af88ff var(--pct, 50%), #3b4965 var(--pct, 50%)); outline-offset: 7px; cursor: pointer; margin: 9px 0; }
+    input[type=range]::-webkit-slider-thumb { appearance: none; width: 17px; height: 17px; border-radius: 50%; background: #faf6ff; border: 4px solid #ac87ff; box-shadow: 0 2px 9px #0005; }
+    input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: #faf6ff; border: 4px solid #ac87ff; }
+    .slider-ends { display: flex; justify-content: space-between; font-size: 11px; color: #75839e; }
+    .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .toggle { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #34425e; background: #10192d; color: #bfcbe3; border-radius: 12px; min-height: 46px; padding: 10px 12px; font-size: 12px; font-weight: 730; text-align: left; }
+    .toggle::after { content: ''; height: 18px; width: 31px; flex: 0 0 auto; background: #3d4c65; border-radius: 99px; border: 2px solid #3d4c65; box-shadow: inset 0 0 0 5px #aab5c65a; transition: all .2s; }
+    .toggle.on { color: white; border-color: #977ecb; background: #9377ed1a; }
+    .toggle.on::after { background: #c2a0ff; border-color: #c2a0ff; box-shadow: inset -11px 0 0 #fff; }
+    .help { border: 1px solid #3d3f62; background: #8e81ff0d; padding: 13px 15px; border-radius: 12px; color: #afbbd4; line-height: 1.55; font-size: 12px; margin-top: 21px; }
+    .right { position: sticky; top: 19px; display: grid; gap: 19px; min-width: 0; }
+    .preview-head { padding: 17px 19px 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .preview-head h2, .output-head h2 { font-size: 17px; }
+    .live { display: inline-flex; align-items: center; gap: 6px; color: #93e7c8; text-transform: uppercase; font-size: 10px; letter-spacing: .12em; font-weight: 850; }
+    .live::before { content: ''; height: 6px; width: 6px; border-radius: 50%; background: #66e2b6; box-shadow: 0 0 7px #55e8a7; }
+    .screen { margin: 0 12px 13px; border-radius: 13px; overflow: hidden; line-height: 0; border: 1px solid #48516c; box-shadow: 0 10px 23px #080c1d80; background: #1d1b37; position: relative; }
+    .screen canvas { width: 100%; height: auto; display: block; aspect-ratio: 9/5; cursor: pointer; touch-action: manipulation; }
+    .screen-caption { color: #a6b2ca; display: flex; gap: 7px; justify-content: center; align-items: center; padding: 0 15px 15px; font-size: 11px; }
+    .output-head { display: flex; justify-content: space-between; gap: 15px; align-items: center; padding: 20px 19px 12px; }
+    .prompt-len { color: #8fa2c2; font-size: 11px; white-space: nowrap; }
+    .prompt-text { display: block; width: calc(100% - 24px); margin: 0 12px; height: 222px; resize: vertical; min-height: 145px; padding: 15px 16px; border-radius: 13px; background: #0b1427; border: 1px solid #34415c; color: #bccce6; font: 12px/1.66 ui-monospace, SFMono-Regular, Consolas, monospace; outline-offset: 1px; }
+    .prompt-actions { padding: 13px 12px 15px; display: flex; gap: 9px; }
+    .copy { flex: 1; min-height: 45px; border-radius: 12px; border: 0; font-size: 13px; font-weight: 850; color: #1b1d30; background: linear-gradient(100deg, #ff84a7, #b997ff); box-shadow: 0 8px 25px #b681e333; }
+    .copy:hover { filter: brightness(1.08); }
+    .footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 7px; padding: 21px 3px 0; color: #72829e; font-size: 11px; }
+    .footer b { color: #a7b4ce; }
+    @media (max-width: 1120px) {
+      .workspace { grid-template-columns: minmax(0, 1fr) minmax(325px, .92fr); gap: 14px; }
+      .tab { padding: 14px 8px; font-size: 11px; }
+      .tab-panel { padding: 22px 19px; }
+    }
+    @media (max-width: 840px) {
+      .workspace { grid-template-columns: 1fr; }
+      .right { position: static; grid-template-columns: 1fr 1fr; }
+      .tab-panel { min-height: 0; }
+      .prompt-text { height: 186px; }
+      .tab { font-size: 12px; }
+    }
+    @media (max-width: 630px) {
+      .app { padding-top: 17px; }
+      .brand { font-size: 22px; }
+      .top-actions .micro { display: none; }
+      .heading { padding-top: 28px; }
+      .right { grid-template-columns: 1fr; }
+      .choice-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .choice { min-height: 66px; font-size: 10px; }
+      .choice-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .panel { border-radius: 17px; }
+      .tab-panel { padding: 21px 16px 25px; }
+      .tab { font-size: 11px; }
+      .tab span { display: none; }
+      .cols { gap: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">✦</span> FLY<span>LAB</span></div>
+      <div class="top-actions"><span class="micro">Конструктор игр · v1.2</span><button id="resetBtn" class="reset" type="button">↺ Сбросить</button></div>
+    </header>
+
+    <div class="heading">
+      <div class="eyebrow">Собери свою игру</div>
+      <h1>Твоя идея. <em>Твой промпт.</em></h1>
+      <p class="subline">Выбирай настройки → смотри превью → копируй готовое ТЗ.</p>
+    </div>
+
+    <div class="workspace">
+      <section class="panel" aria-label="Настройки игры">
+        <nav class="tabs" aria-label="Разделы конструктора">
+          <button type="button" class="tab active" data-tab="hero" aria-selected="true"><span>🦸</span> Герой</button>
+          <button type="button" class="tab" data-tab="world" aria-selected="false"><span>🌆</span> Мир</button>
+          <button type="button" class="tab" data-tab="obstacles" aria-selected="false"><span>🚧</span> Преграды</button>
+        </nav>
+
+        <div class="tab-panel active" id="panel-hero" role="tabpanel">
+          <div class="panel-top"><h2>Кто летит?</h2><span class="count">01 / 03</span></div>
+          <div class="field"><label class="field-label" for="title">Название игры</label><input id="title" data-field="title" class="form-input" maxlength="65" placeholder="Название игры" /></div>
+          <div class="field"><div class="field-label">Главный герой</div><div class="choice-grid" id="heroChoices"></div></div>
+          <div class="field"><label class="field-label" for="heroName">Имя / описание героя</label><input id="heroName" data-field="heroName" class="form-input" maxlength="100" placeholder="Например, Человек-паук" /></div>
+          <div class="cols">
+            <div class="field"><label class="field-label" for="heroColor">Основной цвет</label><div class="swatch-field"><input type="color" id="heroColor" data-field="heroColor" /><span class="hex" data-hex="heroColor"></span></div></div>
+            <div class="field"><label class="field-label" for="heroAccent">Доп. цвет</label><div class="swatch-field"><input type="color" id="heroAccent" data-field="heroAccent" /><span class="hex" data-hex="heroAccent"></span></div></div>
+          </div>
+          <div class="field"><div class="field-label">Стиль героя</div><div class="choice-grid style-grid" id="styleChoices" role="group" aria-label="Стиль героя"></div></div>
+          <div class="field"><div class="slider-head"><label class="field-label" for="heroSize">Размер героя</label><output class="value" id="heroSizeVal"></output></div><input type="range" id="heroSize" data-field="heroSize" min="28" max="64" step="2" /><div class="slider-ends"><span>Маленький</span><span>Большой</span></div></div>
+        </div>
+
+        <div class="tab-panel" id="panel-world" role="tabpanel">
+          <div class="panel-top"><h2>Где происходит игра?</h2><span class="count">02 / 03</span></div>
+          <div class="field"><div class="field-label">Локация</div><div class="choice-grid" id="worldChoices"></div></div>
+          <div class="cols">
+            <div class="field"><label class="field-label" for="timeOfDay">Время суток</label><select id="timeOfDay" class="form-select" data-field="timeOfDay"><option value="sunset">Розовый закат</option><option value="night">Глубокая ночь</option><option value="day">Яркий день</option><option value="dawn">Рассвет</option></select></div>
+            <div class="field"><label class="field-label" for="weather">Погода</label><select id="weather" class="form-select" data-field="weather"><option value="clear">Ясно</option><option value="stars">Мерцающие звёзды</option><option value="rain">Дождь</option><option value="snow">Снег</option><option value="fog">Туман</option></select></div>
+          </div>
+          <div class="cols">
+            <div class="field"><label class="field-label" for="ground">Поверхность</label><select id="ground" class="form-select" data-field="ground"><option value="asphalt">Асфальт</option><option value="grass">Трава</option><option value="sand">Песок</option><option value="water">Вода</option><option value="metal">Металл</option><option value="cloud">Облака</option></select></div>
+            <div class="field"><label class="field-label" for="palette">Палитра мира</label><select id="palette" class="form-select" data-field="palette"><option value="pink">Розовый + оранжевый</option><option value="blue">Синий + фиолетовый</option><option value="mint">Бирюза + индиго</option><option value="gold">Золото + бордо</option><option value="pastel">Пастельная</option></select></div>
+          </div>
+          <div class="field"><div class="field-label">Атмосфера</div><div class="toggle-grid"><button type="button" class="toggle" data-toggle="parallax">Движущийся фон</button><button type="button" class="toggle" data-toggle="stars">Блики / звёзды</button><button type="button" class="toggle" data-toggle="weatherFx">Частицы погоды</button><button type="button" class="toggle" data-toggle="sunGlow">Свечение неба</button></div></div>
+        </div>
+
+        <div class="tab-panel" id="panel-obstacles" role="tabpanel">
+          <div class="panel-top"><h2>Что мешает лететь?</h2><span class="count">03 / 03</span></div>
+          <div class="field"><div class="field-label">Тип преград</div><div class="choice-grid three" id="obstacleChoices"></div></div>
+          <div class="cols">
+            <div class="field"><label class="field-label" for="obstacleColor">Цвет преград</label><div class="swatch-field"><input type="color" id="obstacleColor" data-field="obstacleColor" /><span class="hex" data-hex="obstacleColor"></span></div></div>
+            <div class="field"><label class="field-label" for="obstacleMotion">Движение</label><select class="form-select" id="obstacleMotion" data-field="obstacleMotion"><option value="fixed">Без движения по Y</option><option value="sway">Плавно вверх-вниз</option><option value="alternate">Чередующиеся проходы</option></select></div>
+          </div>
+          <div class="cols">
+            <div class="field"><div class="slider-head"><label class="field-label" for="gap">Ширина пролёта</label><output class="value" id="gapVal"></output></div><input type="range" id="gap" data-field="gap" min="145" max="270" step="5" /><div class="slider-ends"><span>Сложнее</span><span>Проще</span></div></div>
+            <div class="field"><div class="slider-head"><label class="field-label" for="obstacleWidth">Толщина</label><output class="value" id="obstacleWidthVal"></output></div><input type="range" id="obstacleWidth" data-field="obstacleWidth" min="50" max="140" step="5" /><div class="slider-ends"><span>Узкие</span><span>Широкие</span></div></div>
+          </div>
+          <div class="field"><label class="field-label" for="scoreRule">Начисление очков</label><select class="form-select" id="scoreRule" data-field="scoreRule"><option value="pass">+1 за пройденный пролёт</option><option value="collect">+1 за монету в пролёте</option><option value="passBonus">+1 за пролёт, бонус за серию</option></select></div>
+        </div>
+
+      </section>
+
+      <aside class="right" aria-label="Предпросмотр и итоговый промпт">
+        <section class="panel">
+          <div class="preview-head"><h2>Превью игры</h2><span class="live">Live preview</span></div>
+          <div class="screen"><canvas id="preview" width="900" height="500" aria-label="Анимированный предпросмотр мира игры"></canvas></div>
+          <div class="screen-caption">✦ Нажми на превью, чтобы герой подпрыгнул</div>
+        </section>
+        <section class="panel" id="outputSection">
+          <div class="output-head"><h2>Готовый промпт</h2><span class="prompt-len" id="promptLength"></span></div>
+          <textarea id="promptOutput" class="prompt-text" readonly aria-label="Сгенерированный промпт"></textarea>
+          <div class="prompt-actions"><button type="button" class="copy" id="copyBtn">📋 Скопировать промпт</button></div>
+        </section>
+      </aside>
+    </div>
+    <footer class="footer"><span>FLYLAB · Без библиотек и регистрации</span><span><b>Промпт → HTML-код</b> · Для вставки в редактор</span></footer>
+  </main>
+
+  <script>
+    'use strict';
+
+    // Настройки героя, мира и препятствий.
+    const defaults = {
+      title: 'пипапупа', hero: 'spider', heroName: 'Spider-Man', heroColor: '#f44356', heroAccent: '#2477d7',
+      artStyle: 'cartoon', heroSize: 44, world: 'london', timeOfDay: 'sunset', weather: 'stars',
+      ground: 'asphalt', palette: 'pink', parallax: true, stars: true, weatherFx: true, sunGlow: true,
+      obstacle: 'spiked', obstacleColor: '#11121e', obstacleMotion: 'fixed', gap: 205,
+      obstacleWidth: 90, scoreRule: 'pass'
+    };
+    // Игровая механика зафиксирована, чтобы конструктор оставался простым.
+    const GAME = Object.freeze({gravity: 0.25, jumpForce: -5.0, speed: 2.5, interval: 120});
+
+    const heroOptions = [
+      ['spider','🕷️','Паук','Spider-Man','#f44356','#2477d7'],
+      ['bird','🐤','Птичка','Маленькая смелая птица','#ffcb48','#ff8d36'],
+      ['cat','🐱','Кот','Космический кот','#f5a45c','#ffecc4'],
+      ['robot','🤖','Робот','Летающий робот','#4fdcd5','#4e68e5'],
+      ['dragon','🐉','Дракон','Добрый маленький дракон','#67dc99','#4b79b9'],
+      ['astro','👩‍🚀','Астронавт','Маленький астронавт','#f2f5ff','#3a9cde'],
+      ['ghost','👻','Призрак','Весёлый призрак','#ece7ff','#a68ce5'],
+      ['custom','✏️','Свой','Мой уникальный персонаж','#f56e9c','#76c5f2']
+    ];
+    const styleOptions = [
+      ['cartoon','','Мультяшный'], ['pixel','','Пиксель'], ['neon','','Неон'],
+      ['vector','','Вектор'], ['3d','','3D']
+    ];
+    const worldOptions = [
+      ['london','🇬🇧','Лондон'], ['space','🪐','Космос'], ['jungle','🌿','Джунгли'], ['cyber','🌃','Киберпанк'],
+      ['sea','🐚','Океан'], ['desert','🏜️','Пустыня'], ['mountains','🏔️','Горы'], ['candy','🍭','Сказка']
+    ];
+    const obstacleOptions = [
+      ['spiked','🔺','Трубы с шипами'], ['pipes','🟩','Трубы'], ['lasers','⚡','Лазеры'],
+      ['towers','🏙️','Башни'], ['crystals','💎','Кристаллы'], ['vines','🌿','Лианы']
+    ];
+    const labels = {
+      hero: Object.fromEntries(heroOptions.map(x => [x[0],x[2]])),
+      world: Object.fromEntries(worldOptions.map(x => [x[0],x[2]])),
+      obstacle: Object.fromEntries(obstacleOptions.map(x => [x[0],x[2]])),
+      artStyle: {cartoon:'выразительная мультяшная графика',pixel:'чёткий пиксель-арт',neon:'неоновая графика с мягким свечением',vector:'чистая векторная иллюстрация', '3d':'объёмная псевдо-3D иллюстрация'},
+      timeOfDay: {sunset:'розово-оранжевый закат на фоне ночного неба',night:'глубокая ночь',day:'яркий день',dawn:'пастельный рассвет'},
+      weather: {clear:'ясная погода',stars:'мерцающие звёзды',rain:'дождь',snow:'снег',fog:'лёгкий туман'},
+      ground: {asphalt:'асфальт с разметкой и фактурой',grass:'трава',sand:'песок',water:'вода',metal:'металлическая платформа',cloud:'мягкие облака'},
+      palette: {pink:'розово-оранжевая с фиолетовым',blue:'сине-фиолетовая',mint:'бирюзово-индиговая',gold:'золотисто-бордовая',pastel:'нежная пастельная'},
+      obstacleMotion: {fixed:'только горизонтальный сдвиг',sway:'плавное вертикальное покачивание',alternate:'чередование высоты промежутков'},
+      scoreRule: {pass:'+1 очко за каждый полностью пройденный промежуток',collect:'+1 очко при сборе монеты в промежутке',passBonus:'+1 за пролёт и бонус за серию без столкновений'}
+    };
+
+    let state = {...defaults};
+    try {
+      const stored = JSON.parse(localStorage.getItem('flylab-settings') || 'null');
+      if (stored && typeof stored === 'object') {
+        for (const key of Object.keys(defaults)) {
+          if (typeof stored[key] === typeof defaults[key]) state[key] = stored[key];
+        }
+      }
+    } catch (_) { /* Локальное сохранение необязательно. */ }
+
+    function renderOptionGroup(id, type, items) {
+      const group = document.getElementById(id);
+      items.forEach(item => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'choice';
+        b.dataset.choiceType = type;
+        b.dataset.choice = item[0];
+        b.setAttribute('aria-pressed', 'false');
+        const icon = document.createElement('span');
+        if (type === 'artStyle') {
+          b.classList.add('style-choice', 'style--' + item[0]);
+          icon.className = 'style-figure';
+          icon.setAttribute('aria-hidden', 'true');
+        } else {
+          icon.className = 'emoji'; icon.textContent = item[1];
+        }
+        const label = document.createElement('span');
+        label.textContent = item[2];
+        b.append(icon, label);
+        group.append(b);
+      });
+    }
+    renderOptionGroup('heroChoices','hero',heroOptions);
+    renderOptionGroup('styleChoices','artStyle',styleOptions);
+    renderOptionGroup('worldChoices','world',worldOptions);
+    renderOptionGroup('obstacleChoices','obstacle',obstacleOptions);
+
+    function selectTab(id) {
+      document.querySelectorAll('.tab').forEach(btn => {
+        const active = btn.dataset.tab === id;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', String(active));
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === 'panel-' + id));
+    }
+    document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => selectTab(btn.dataset.tab)));
+
+    document.addEventListener('click', e => {
+      const choice = e.target.closest('[data-choice]');
+      if (choice) {
+        const {choiceType, choice: value} = choice.dataset;
+        state[choiceType] = value;
+        if (choiceType === 'hero' && value !== 'custom') {
+          const option = heroOptions.find(x => x[0] === value);
+          state.heroName = option[3]; state.heroColor = option[4]; state.heroAccent = option[5];
+        }
+        changed();
+      }
+      const toggle = e.target.closest('[data-toggle]');
+      if (toggle) { state[toggle.dataset.toggle] = !state[toggle.dataset.toggle]; changed(); }
+    });
+
+    document.querySelectorAll('[data-field]').forEach(field => {
+      const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+      field.addEventListener(eventName, () => {
+        const key = field.dataset.field;
+        state[key] = field.type === 'range' ? Number(field.value) : field.value;
+        changed(false);
+      });
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => { state = {...defaults}; changed(); });
+
+    const formatters = {
+      heroSize: v => `${v} px`, gap: v => `${v} px`, obstacleWidth: v => `${v} px`
+    };
+    function refreshControls() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const key = el.dataset.field;
+        if (document.activeElement !== el) el.value = String(state[key]);
+        if (el.type === 'range') {
+          const out = document.getElementById(key + 'Val');
+          if (out) out.textContent = formatters[key](state[key]);
+          const min = Number(el.min), max = Number(el.max);
+          el.style.setProperty('--pct', `${Math.max(0,Math.min(100,(Number(state[key])-min)/(max-min)*100))}%`);
+        }
+      });
+      document.querySelectorAll('[data-hex]').forEach(el => { el.textContent = state[el.dataset.hex].toUpperCase(); });
+      document.querySelectorAll('[data-choice]').forEach(el => {
+        const active = state[el.dataset.choiceType] === el.dataset.choice;
+        el.classList.toggle('active', active); el.setAttribute('aria-pressed', String(active));
+      });
+      document.querySelectorAll('[data-toggle]').forEach(el => {
+        const active = !!state[el.dataset.toggle];
+        el.classList.toggle('on', active); el.setAttribute('aria-pressed', String(active));
+      });
+    }
+
+    function buildPrompt(s) {
+      const heroDetails = s.hero === 'spider'
+        ? 'маска, большие белые глаза с бликами, красно-синий костюм и узор паутины'
+        : s.hero === 'custom' ? 'уникальный узнаваемый силуэт и выразительные детали'
+        : 'чёткий силуэт, выразительная мимика и блики';
+      const worldDetails = {
+        london:'ночной Лондон, Биг-Бен и городской силуэт',
+        space:'планеты и космические станции', jungle:'слои тропического леса',
+        cyber:'неоновые небоскрёбы и вывески', sea:'подводные рифы и пузырьки',
+        desert:'барханы и скалы', mountains:'горные хребты и облака',
+        candy:'сказочная архитектура и необычные деревья'
+      }[s.world];
+      const obstacleDetails = {
+        spiked:'объёмные трубы с треугольными шипами в духе Geometry Dash',
+        pipes:'объёмные трубы', lasers:'светящиеся лазеры',
+        towers:'высокие башни', crystals:'острые кристаллы', vines:'лианы'
+      }[s.obstacle];
+      const effects = [
+        s.parallax && 'параллакс', s.stars && 'мерцание звёзд',
+        s.weatherFx && s.weather !== 'clear' && 'анимация погоды',
+        s.sunGlow && 'свечение горизонта'
+      ].filter(Boolean).join(', ') || 'без дополнительных фоновых эффектов';
+      const artStyle = labels.artStyle[s.artStyle];
+      return `Ты разработчик браузерных игр. Создай красивую игру в духе Flappy Bird. Весь код — в одном HTML-документе со встроенными <style> и <script>, без библиотек и внешних ассетов.\n\n` +
+        `ИГРА: «${s.title.trim() || 'Моя игра'}». Canvas 900×500, адаптивный горизонтальный формат.\n` +
+        `ГЕРОЙ: ${s.heroName.trim() || labels.hero[s.hero]} (${labels.hero[s.hero]}). Стиль — ${artStyle}; действительно отрисуй персонажа именно в этом стиле, а не только назови его. ${heroDetails}. Цвета: ${s.heroColor} и ${s.heroAccent}. Размер ${s.heroSize} px, плавный наклон при полёте.\n` +
+        `МИР: ${worldDetails}. Время — ${labels.timeOfDay[s.timeOfDay]}, погода — ${labels.weather[s.weather]}, палитра — ${labels.palette[s.palette]}. Земля — ${labels.ground[s.ground]}. Эффекты: ${effects}. Фон анимированный, многослойный.\n` +
+        `ПРЕГРАДЫ: ${obstacleDetails}; цвет ${s.obstacleColor}, ширина ${s.obstacleWidth} px, пролёт ${s.gap} px. Движение справа налево; ${labels.obstacleMotion[s.obstacleMotion]}. Счёт: ${labels.scoreRule[s.scoreRule]}.\n\n` +
+        `МЕХАНИКА: пробел/клик/тап — импульс вверх, без нажатия — гравитация. Комфортная физика: gravity ${GAME.gravity}, jumpForce ${GAME.jumpForce.toFixed(1)}, obstacleSpeed ${GAME.speed}, obstacleInterval ${GAME.interval} кадров. Уменьшенный хитбокс; удар о преграду или землю завершает игру. Частицы при столкновении.\n` +
+        `ЭКРАНЫ: старт с названием и кнопкой «▶ Играть»; в игре крупный счёт по центру; при проигрыше затемнение, итоговый счёт, рекорд и кнопка «🔄 Заново».\n` +
+        `КОД: Canvas 2D, requestAnimationFrame, корректные коллизии, перезапуск, сохранение рекорда, поддержка телефона. Читаемый JavaScript с комментариями. Проверь синтаксис.\n\n` +
+        `ФОРМАТ ОТВЕТА: выведи ПРЯМО В СООБЩЕНИИ только полный рабочий HTML-код для копирования и вставки в HTML-редактор (например, CodePen). Первая строка — <!DOCTYPE html>, последняя — закрывающий тег html. Не создавай и не прикладывай файл. Не предлагай скачивание. Без Markdown-блоков, тройных кавычек, ссылок, вступления и пояснений — ТОЛЬКО КОД.`;
+    }
+
+    function changed(syncInputs = true) {
+      if (syncInputs) refreshControls();
+      else {
+        // Пока пользователь печатает, не трогаем фокус и каретку.
+        const active = document.activeElement;
+        refreshControls();
+        if (active && active.dataset && active.dataset.field && active.type !== 'range') active.focus();
+      }
+      const prompt = buildPrompt(state);
+      document.getElementById('promptOutput').value = prompt;
+      document.getElementById('promptLength').textContent = `${prompt.length.toLocaleString('ru-RU')} знаков`;
+      try { localStorage.setItem('flylab-settings', JSON.stringify(state)); } catch (_) {}
+    }
+
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', async () => {
+      const text = document.getElementById('promptOutput').value;
+      try {
+        if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+        else {
+          const textarea = document.getElementById('promptOutput');
+          textarea.focus(); textarea.select();
+          if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');
+          window.getSelection()?.removeAllRanges();
+        }
+        copyBtn.textContent = '✓ Промпт скопирован';
+        setTimeout(() => { copyBtn.textContent = '📋 Скопировать промпт'; }, 1900);
+      } catch (_) {
+        const textarea = document.getElementById('promptOutput');
+        textarea.focus(); textarea.select();
+        copyBtn.textContent = 'Выделено — нажми Ctrl+C';
+        setTimeout(() => { copyBtn.textContent = '📋 Скопировать промпт'; }, 2500);
+      }
+    });
+
+
+    // Canvas-превью визуализирует выбор; итоговая игра создаётся по промпту.
+    const canvas = document.getElementById('preview');
+    const ctx = canvas.getContext('2d');
+    const CW = 900, CH = 500, GY = 440;
+    let lastFrame = 0, phase = 0, flap = 0, frame = 0;
+    const rand = seed => {
+      const x = Math.sin(seed * 127.1 + 78.233) * 43758.5453;
+      return x - Math.floor(x);
+    };
+    const stars = Array.from({length: 70},(_,i) => ({x:rand(i+12)*CW, y:rand(i+89)*290+8, r:rand(i+59)*1.5+.5, speed:rand(i+13)*.08+.025}));
+    const particles = Array.from({length: 32},(_,i) => ({x:rand(i+301)*CW,y:rand(i+401)*GY,r:rand(i+555)*2+1}));
+    const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
+    function hexToRgb(hex) {
+      const c = (hex || '#000000').replace('#','');
+      return [parseInt(c.slice(0,2),16)||0,parseInt(c.slice(2,4),16)||0,parseInt(c.slice(4,6),16)||0];
+    }
+    function colorAlpha(hex,a) { const c=hexToRgb(hex); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+    function roundRect(x,y,w,h,r,fill) {
+      if (w <= 0 || h <= 0) return;
+      ctx.beginPath(); ctx.roundRect(x,y,w,h,Math.min(r,w/2,h/2));
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    }
+    function sky() {
+      const p = state.palette;
+      const time = state.timeOfDay;
+      let colors;
+      if (time === 'day') colors = p === 'mint' ? ['#4ab8d7','#76d1d6','#e9f0d0'] : ['#528fd3','#b0d6f7','#fbe5b0'];
+      else if (time === 'night') colors = p === 'gold' ? ['#170b2f','#3c1436','#9c3e4e'] : ['#0a0f2b','#272657','#6c448c'];
+      else if (time === 'dawn') colors = ['#39446b','#988bb8','#ffd3ac'];
+      else if (p === 'blue') colors = ['#141a4a','#594e98','#a8a4f7'];
+      else if (p === 'mint') colors = ['#102d53','#3489a2','#a1d5bd'];
+      else if (p === 'gold') colors = ['#2b1130','#923c5b','#ffb66e'];
+      else if (p === 'pastel') colors = ['#696b9d','#b39aca','#ffd4be'];
+      else colors = ['#111839','#66447d','#ff9c83'];
+      const g = ctx.createLinearGradient(0,0,0,GY); g.addColorStop(0,colors[0]);g.addColorStop(.55,colors[1]);g.addColorStop(1,colors[2]);
+      ctx.fillStyle = g; ctx.fillRect(0,0,CW,CH);
+      if (state.sunGlow) {
+        const sunX = state.world === 'london' ? 735 : 680;
+        const glow = ctx.createRadialGradient(sunX,290,5,sunX,290,235);
+        glow.addColorStop(0,time==='night'?'#a3a2f25e':'#ffcf8e92');glow.addColorStop(1,'#ffc08a00');
+        ctx.fillStyle=glow;ctx.fillRect(0,60,CW,380);
+        ctx.beginPath();ctx.arc(sunX,287,time==='night'?23:40,0,Math.PI*2);
+        ctx.fillStyle=time==='night'?'#e5e6ffe3':'#ffdaabbd';ctx.fill();
+      }
+      if (state.stars || state.weather==='stars' || state.world==='space') {
+        stars.forEach((s,i) => {
+          const twinkle = .4+.6*Math.abs(Math.sin(phase*.03+i*13));
+          ctx.globalAlpha = twinkle*(time==='day'?.4:1); ctx.fillStyle='#fbf5ff';
+          ctx.beginPath();ctx.arc((s.x-(state.parallax?phase*s.speed:0)+CW)%CW,s.y,s.r,0,Math.PI*2);ctx.fill();
+        });ctx.globalAlpha=1;
+      }
+    }
+    function building(x,base,w,h,color) {
+      ctx.fillStyle=color;ctx.fillRect(x,base-h,w,h);
+      for(let i=9;i<w-3;i+=19)for(let j=13;j<h-3;j+=22){
+        if(rand(x*2+i+j)>.57){ctx.fillStyle='rgba(255,206,129,.44)';ctx.fillRect(x+i,base-h+j,5,8);}
+      }
+    }
+    function drawLondon() {
+      const offset = state.parallax ? phase*.09%120 : 0;
+      ctx.save();ctx.translate(-offset,0);
+      for(let k=-1;k<10;k++){
+        const x=k*123;
+        building(x,440,110,68+Math.floor(rand(k+17)*145),'#283047');
+        ctx.fillStyle='#33334d';ctx.fillRect(x+37,259,3,26);
+      }
+      ctx.restore();
+      // Узнаваемая силуэтная часовая башня Биг-Бен.
+      const x=556;
+      ctx.save();
+      ctx.fillStyle='#28263b';ctx.fillRect(x,172,73,268);
+      ctx.fillStyle='#382b43';ctx.fillRect(x+8,176,57,264);
+      for(let j=194;j<437;j+=24){ctx.fillStyle='#65506b';ctx.fillRect(x+9,j,55,3);}
+      ctx.fillStyle='#2d2a44';ctx.fillRect(x-10,160,93,19);ctx.fillRect(x-6,144,85,12);
+      ctx.beginPath();ctx.moveTo(x-1,144);ctx.lineTo(x+36,94);ctx.lineTo(x+74,144);ctx.closePath();ctx.fill();
+      ctx.fillRect(x+32,75,8,36);ctx.fillRect(x+29,67,14,9);
+      ctx.beginPath();ctx.arc(x+36,202,28,0,Math.PI*2);ctx.fillStyle='#d8b785';ctx.fill();
+      ctx.beginPath();ctx.arc(x+36,202,22,0,Math.PI*2);ctx.fillStyle='#f5d89f';ctx.fill();
+      ctx.strokeStyle='#3a324b';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(x+36,202);ctx.lineTo(x+36,187);ctx.moveTo(x+36,202);ctx.lineTo(x+47,206);ctx.stroke();
+      ctx.restore();
+    }
+    function drawSpace() {
+      for(let i=0;i<3;i++) {
+        const x=((i*340+150-(state.parallax?phase*(.22+i*.09):0))%(CW+300)+(CW+300))%(CW+300)-110;
+        const y=110+i*80;
+        ctx.beginPath();ctx.arc(x,y,45+i*11,0,Math.PI*2);ctx.fillStyle=['#8b65b8','#e7a1b8','#68aebc'][i];ctx.fill();
+        if(i===1) {ctx.save();ctx.translate(x,y);ctx.rotate(-.3);ctx.strokeStyle='#f1d9ddaa';ctx.lineWidth=12;ctx.beginPath();ctx.ellipse(0,0,80,17,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      }
+    }
+    function drawLandscape() {
+      const w = state.world;
+      if (w==='space') {drawSpace();return;}
+      if (w==='london') {drawLondon();return;}
+      if (w==='cyber') {
+        for(let i=-1;i<13;i++){
+          const x=i*87-(state.parallax?phase*.10%87:0);const h=100+rand(i+35)*200;
+          building(x,GY,76,h,'#172b50');
+          ctx.fillStyle='#6e82f655';ctx.fillRect(x+8,GY-h+11,3,h-20);
+          ctx.fillStyle='#ff54bd88';ctx.fillRect(x+50,GY-h+20,4,Math.max(15,h-35));
+        }return;
+      }
+      if (w==='jungle') {
+        for(let i=-1;i<16;i++){
+          const x=i*82-(state.parallax?phase*.11%82:0),h=90+rand(i+58)*100;
+          ctx.fillStyle='#204d4a';ctx.fillRect(x+21,GY-h+15,14,h);
+          for(let j=0;j<3;j++) {ctx.beginPath();ctx.arc(x+28+Math.sin(j*3)*20,GY-h+j*17,30-j*4,0,Math.PI*2);ctx.fillStyle=['#2a7160','#286852','#1c574c'][j];ctx.fill();}
+        }return;
+      }
+      if(w==='sea') {
+        for(let j=0;j<4;j++){ctx.beginPath();ctx.moveTo(0,250+j*55);for(let x=0;x<=CW;x+=18)ctx.lineTo(x,250+j*55+Math.sin(x*.015+phase*.012+j)*12);ctx.lineTo(CW,CH);ctx.lineTo(0,CH);ctx.fillStyle=['#20879a20','#1c687d45','#145b7455','#134c6680'][j];ctx.fill();}
+        for(let i=0;i<17;i++){const x=rand(i+205)*CW,y=rand(i+20)*GY;ctx.strokeStyle='#d6ffff63';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,((y-phase*.35)%GY+GY)%GY,3+rand(i)*6,0,Math.PI*2);ctx.stroke();}return;
+      }
+      if (w==='desert' || w==='mountains') {
+        for(let j=0;j<3;j++){
+          const off=state.parallax?phase*(.02+j*.04):0;
+          ctx.beginPath();ctx.moveTo(0,CH);
+          for(let x=-100;x<=CW+160;x+=28){const z=x+off; const y=320+j*35+(w==='mountains'?Math.abs(Math.sin(z*.008+j*2))*-80:Math.sin(z*.007+j*2)*22);ctx.lineTo(x,y);}
+          ctx.lineTo(CW,CH);ctx.fillStyle=w==='mountains'?['#7b779f','#555b83','#39435c'][j]:['#e9a68c','#d58174','#ad6069'][j];ctx.fill();
+        }return;
+      }
+      if(w==='candy') {
+        for(let i=0;i<10;i++){
+          const x=i*110-(state.parallax?phase*.08%110:0),y=275+rand(i)*75;
+          ctx.fillStyle=['#cc7ebc','#866ecb','#ffb6ba'][i%3];ctx.fillRect(x+20,y,13,GY-y);
+          ctx.beginPath();ctx.arc(x+27,y,35,0,Math.PI*2);ctx.fill();
+          ctx.strokeStyle='#ffffff8c';ctx.lineWidth=4;ctx.beginPath();ctx.arc(x+27,y,17,0,Math.PI*1.5);ctx.stroke();
+        }
+      }
+    }
+    function drawGround() {
+      const groundColor = {asphalt:'#25293a',grass:'#315948',sand:'#ae7e67',water:'#24617d',metal:'#39495c',cloud:'#bdc9de'}[state.ground];
+      ctx.fillStyle=groundColor;ctx.fillRect(0,GY,CW,CH-GY);
+      ctx.fillStyle=state.ground==='asphalt'?'#b9a6d1':'#ffffff80';ctx.fillRect(0,GY,CW,4);
+      const shift = state.parallax?phase*GAME.speed*.9%80:0;
+      if(state.ground==='asphalt'||state.ground==='metal'){
+        ctx.fillStyle=state.ground==='asphalt'?'#e6c5877d':'#aabbd288';
+        for(let x=-80;x<CW+80;x+=80)roundRect(x-shift,GY+33,42,4,2,ctx.fillStyle);
+      }else if(state.ground==='grass'){
+        ctx.strokeStyle='#8cd8a080';ctx.lineWidth=2;
+        for(let x=0;x<CW;x+=12){ctx.beginPath();ctx.moveTo(x,GY+4);ctx.lineTo(x-2,GY-4-rand(x)*7);ctx.stroke();}
+      }else if(state.ground==='water'){
+        ctx.strokeStyle='#c2ffff77';ctx.lineWidth=2;
+        for(let x=0;x<CW;x+=75){ctx.beginPath();ctx.ellipse(x-shift,GY+20,28,4,0,0,Math.PI);ctx.stroke();}
+      }
+    }
+    function spike(cx,y,direction,size) {
+      ctx.beginPath();ctx.moveTo(cx-size/2,y);ctx.lineTo(cx+size/2,y);ctx.lineTo(cx,y+direction*size*.8);ctx.closePath();ctx.fill();
+    }
+    function drawObstacle(x,gapTop,gapSize,width) {
+      const low=gapTop+gapSize;
+      const base = state.obstacleColor;
+      const grad=ctx.createLinearGradient(x,0,x+width,0);
+      grad.addColorStop(0,colorAlpha(base,.94));grad.addColorStop(.32,colorAlpha(base,.99));
+      grad.addColorStop(.75,colorAlpha(base,.80));grad.addColorStop(1,'#090b1be8');
+      const topH=Math.max(0,gapTop-12),lowH=Math.max(0,GY-low-12);
+      roundRect(x,-12,width,topH+12,5,grad);roundRect(x,low+12,width,lowH+15,5,grad);
+      ctx.fillStyle='rgba(255,255,255,.11)';ctx.fillRect(x+width*.18,0,width*.09,topH);
+      ctx.fillRect(x+width*.18,low+12,width*.09,Math.max(0,GY-low-12));
+      ctx.fillStyle=colorAlpha(base,.97);
+      roundRect(x-8,gapTop-24,width+16,19,4,grad);
+      roundRect(x-8,low+5,width+16,19,4,grad);
+      if(state.obstacle==='spiked'||state.obstacle==='crystals'){
+        ctx.fillStyle=state.obstacle==='crystals'?'#9174dd':base;
+        const n=Math.max(2,Math.floor(width/25));const dx=width/n;
+        for(let j=0;j<n;j++) {spike(x+dx*(j+.5),gapTop-5,1,dx*.94);spike(x+dx*(j+.5),low+5,-1,dx*.94);}
+      } else if(state.obstacle==='lasers'){
+        ctx.shadowColor='#fe63a6';ctx.shadowBlur=20;ctx.fillStyle='#f86aa4';
+        ctx.fillRect(x+width*.44,0,width*.12,topH);ctx.fillRect(x+width*.44,low,width*.12,GY-low);ctx.shadowBlur=0;
+      } else if(state.obstacle==='vines'){
+        ctx.strokeStyle='#6ba76a';ctx.lineWidth=5;
+        for(let j=1;j<5;j++){const xx=x+j*width/5;ctx.beginPath();ctx.moveTo(xx,0);ctx.bezierCurveTo(xx+12,50,xx-12,gapTop-18,xx,gapTop);ctx.stroke();}
+      }else if(state.obstacle==='towers'){
+        ctx.fillStyle='#c3c0eb44';for(let j=12;j<width;j+=19){for(let yy=16;yy<topH-14;yy+=22)ctx.fillRect(x+j,yy,6,9);for(let yy=low+30;yy<GY-14;yy+=22)ctx.fillRect(x+j,yy,6,9);}
+      }
+    }
+    function drawSpider(g) {
+      const c=state.heroColor, a=state.heroAccent;
+      const style=state.artStyle;
+      const filledRound = (x,y,w,h,r,color) => {
+        g.fillStyle=color;g.beginPath();g.roundRect(x,y,w,h,r);g.fill();
+      };
+      const suit = style==='3d' ? g.createLinearGradient(-20,0,22,25) : a;
+      if(style==='3d'){suit.addColorStop(0,'#9ad6ff');suit.addColorStop(.32,a);suit.addColorStop(1,'#0a2559');}
+      filledRound(-21,7,42,23,12,suit);
+      const mask = style==='3d' ? g.createLinearGradient(-24,-22,25,26) : (style==='neon' ? '#301736' : c);
+      if(style==='3d'){mask.addColorStop(0,'#ffb5b1');mask.addColorStop(.27,c);mask.addColorStop(.78,c);mask.addColorStop(1,'#600e2e');}
+      g.fillStyle=mask;g.beginPath();g.ellipse(0,-3,23,27,0,0,Math.PI*2);g.fill();
+      g.strokeStyle=style==='neon' ? a : '#0b16338f';g.lineWidth=style==='vector'?2.5:1.7;
+      g.beginPath();g.moveTo(0,-26);g.lineTo(0,20);
+      for(let v=-13;v<=13;v+=13){g.moveTo(-21,v);g.quadraticCurveTo(0,v+8,21,v);}
+      g.stroke();
+      g.fillStyle=style==='neon'?'#baffff':'#f3f7ff';
+      g.beginPath();g.moveTo(-19,-11);g.quadraticCurveTo(-13,-18,-3,-8);g.quadraticCurveTo(-6,4,-18,1);g.closePath();g.fill();
+      g.beginPath();g.moveTo(19,-11);g.quadraticCurveTo(13,-18,3,-8);g.quadraticCurveTo(6,4,18,1);g.closePath();g.fill();
+      g.strokeStyle=style==='neon'?a:'#14213e';g.lineWidth=style==='vector'?3:2;g.stroke();
+      g.fillStyle='#ffffffdf';g.beginPath();g.arc(-11,-10,2.4,0,Math.PI*2);g.arc(11,-10,2.4,0,Math.PI*2);g.fill();
+      filledRound(-28,13,10,16,5,c);filledRound(18,13,10,16,5,c);
+      if(style==='3d'){
+        g.strokeStyle='#ffffffad';g.lineWidth=3;g.beginPath();g.arc(-5,-9,16,3.35,4.65);g.stroke();
+        const highlight=g.createRadialGradient(-13,-18,1,-7,-12,19);
+        highlight.addColorStop(0,'#ffffffb5');highlight.addColorStop(1,'#ffffff00');
+        g.fillStyle=highlight;g.beginPath();g.ellipse(-5,-7,18,22,-.2,0,Math.PI*2);g.fill();
+      } else if(style==='cartoon') {
+        g.strokeStyle='#511a32';g.lineWidth=3.2;g.beginPath();g.ellipse(0,-3,23,27,0,0,Math.PI*2);g.stroke();
+        g.strokeStyle='#ffffff7f';g.lineWidth=2.5;g.beginPath();g.arc(-7,-10,14,3.4,4.4);g.stroke();
+      } else if(style==='vector') {
+        g.strokeStyle='#ffffff';g.lineWidth=4;g.beginPath();g.moveTo(-20,26);g.lineTo(20,26);g.stroke();
+      }
+    }
+    function drawHeroArt(g) {
+      if(state.hero==='spider') drawSpider(g);
+      else {
+        const style=state.artStyle;
+        let fill=state.heroColor;
+        if(style==='3d') {
+          fill=g.createRadialGradient(-12,-16,1,0,0,39);
+          fill.addColorStop(0,'#ffffff');fill.addColorStop(.15,state.heroColor);fill.addColorStop(1,state.heroAccent);
+        }
+        g.fillStyle=fill;g.beginPath();g.arc(0,0,26,0,Math.PI*2);g.fill();
+        g.lineWidth=style==='vector'?5:4;g.strokeStyle=state.heroAccent;g.stroke();
+        g.font='37px "Apple Color Emoji","Segoe UI Emoji",sans-serif';
+        g.textAlign='center';g.textBaseline='middle';
+        g.fillText((heroOptions.find(h=>h[0]===state.hero)||heroOptions[7])[1],0,1);
+      }
+    }
+    // Два вспомогательных буфера позволяют превью показывать настоящий пиксель-арт.
+    const heroBuffer=document.createElement('canvas');heroBuffer.width=112;heroBuffer.height=112;
+    const heroBufferCtx=heroBuffer.getContext('2d');
+    const pixelBuffer=document.createElement('canvas');pixelBuffer.width=25;pixelBuffer.height=25;
+    const pixelBufferCtx=pixelBuffer.getContext('2d');
+    function drawHero(x,y,tilt) {
+      ctx.save();ctx.translate(x,y);ctx.rotate(tilt);
+      // Увеличение только в предпросмотре: стиль лучше различим на маленьком экране.
+      const scale=state.heroSize/35;ctx.scale(scale,scale);
+      const style=state.artStyle;
+      if(style==='cartoon'||style==='neon'||style==='3d') {
+        for(let i=1;i<5;i++) {
+          ctx.beginPath();ctx.arc(-19-i*12,5+i*2,7-i,0,Math.PI*2);
+          ctx.fillStyle=colorAlpha(state.heroColor,.22-i*.035);ctx.fill();
+        }
+      }
+      if(style==='pixel') {
+        heroBufferCtx.clearRect(0,0,112,112);
+        heroBufferCtx.save();heroBufferCtx.translate(56,56);drawHeroArt(heroBufferCtx);heroBufferCtx.restore();
+        pixelBufferCtx.clearRect(0,0,25,25);
+        pixelBufferCtx.imageSmoothingEnabled=true;
+        pixelBufferCtx.drawImage(heroBuffer,0,0,25,25);
+        ctx.imageSmoothingEnabled=false;
+        ctx.drawImage(pixelBuffer,-43,-43,86,86);
+        ctx.imageSmoothingEnabled=true;
+        // Контрастный квадратный контур подчёркивает крупные пиксели.
+        ctx.strokeStyle=colorAlpha(state.heroAccent,.8);ctx.lineWidth=2;
+        ctx.strokeRect(-29,-30,58,60);
+      } else if(style==='neon') {
+        ctx.save();ctx.shadowBlur=26;ctx.shadowColor=state.heroAccent;
+        ctx.strokeStyle=state.heroAccent;ctx.lineWidth=4;
+        ctx.beginPath();ctx.arc(0,0,32,0,Math.PI*2);ctx.stroke();
+        ctx.shadowBlur=23;ctx.shadowColor=state.heroColor;
+        drawHeroArt(ctx);ctx.restore();
+      } else if(style==='vector') {
+        ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+        // Чистая геометрия, плоские заливки, толстый ровный контур.
+        ctx.fillStyle=state.heroAccent;roundRect(-32,-32,64,64,12,state.heroAccent);
+        ctx.strokeStyle='#f9fbff';ctx.lineWidth=4;
+        ctx.beginPath();ctx.roundRect(-32,-32,64,64,12);ctx.stroke();
+        drawHeroArt(ctx);
+        ctx.fillStyle='#f9fbff';ctx.fillRect(-24,30,48,3);
+      } else {
+        ctx.shadowColor='#040b24a6';ctx.shadowBlur=style==='3d'?24:16;ctx.shadowOffsetY=8;
+        drawHeroArt(ctx);
+      }
+      ctx.restore();
+    }
+    function drawWeather() {
+      if(!state.weatherFx)return;
+      if(state.weather==='rain'||state.weather==='snow'){
+        ctx.strokeStyle=state.weather==='rain'?'#d0e5ff61':'#ffffffa8';ctx.lineWidth=state.weather==='rain'?1.5:3;
+        particles.forEach((p,i)=>{
+          const y=(p.y+phase*(state.weather==='rain'?3.5:1.0)+i*17)%GY;
+          const x=(p.x-phase*(state.weather==='rain'?1:.3)+CW*5)%CW;
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-(state.weather==='rain'?6:1),y+(state.weather==='rain'?17:1));ctx.stroke();
+        });
+      } else if(state.weather==='fog'){
+        const g=ctx.createLinearGradient(0,240,0,GY);g.addColorStop(0,'#b6c7e000');g.addColorStop(1,'#b6c7e044');ctx.fillStyle=g;ctx.fillRect(0,240,CW,200);
+      }
+    }
+    function drawPreview(now) {
+      const dt=Math.min((now-lastFrame)/16.67||1,2); lastFrame=now;
+      phase+=dt;frame++;
+      ctx.clearRect(0,0,CW,CH);
+      sky();drawLandscape();drawWeather();
+      const spacing = Math.max(260,GAME.interval*GAME.speed*1.15);
+      const offset=(phase*GAME.speed*.95)%(spacing*3);
+      for(let i=0;i<4;i++) {
+        const x=620+i*spacing-offset+spacing;
+        if(x < -180 || x > CW+160) continue;
+        let gapTop=93+((i*67)%96);
+        if(state.obstacleMotion==='sway')gapTop+=Math.sin(phase*.018+i)*28;
+        if(state.obstacleMotion==='alternate')gapTop= i%2===0 ? 90 : 192;
+        drawObstacle(x,gapTop,state.gap,state.obstacleWidth);
+      }
+      drawGround();
+      flap*=Math.pow(.91,dt);
+      const yy=245+Math.sin(phase*.035)*13-flap;
+      drawHero(218,yy,clamp(Math.cos(phase*.035)*.18-flap*.006,-.5,.6));
+      const scoreX=CW/2;
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 43px system-ui,sans-serif';
+      ctx.lineWidth=6;ctx.strokeStyle='#15132c77';ctx.strokeText('005',scoreX,52);
+      ctx.fillStyle='#ffffff';ctx.fillText('005',scoreX,52);
+      requestAnimationFrame(drawPreview);
+    }
+    canvas.addEventListener('pointerdown', () => {flap=42;});
+    refreshControls();
+    const prompt = buildPrompt(state);
+    document.getElementById('promptOutput').value = prompt;
+    document.getElementById('promptLength').textContent = `${prompt.length.toLocaleString('ru-RU')} знаков`;
+    requestAnimationFrame(drawPreview);
+  </script>
+</body>
+</html>
