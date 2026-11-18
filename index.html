@@ -181,8 +181,8 @@
 
     <div class="heading">
       <div class="eyebrow">Собери свою игру</div>
-      <h1>Меньше настроек. <em>Больше игры.</em></h1>
-      <p class="subline">8 простых настроек → короткий промпт → HTML-код для редактора.</p>
+      <h1>Конструктор <em>Flappy Bird</em></h1>
+      <p class="subline">Выбери героя, фон и препятствия — получи HTML-промпт.</p>
     </div>
 
     <div class="workspace">
@@ -206,7 +206,7 @@
             <div class="field"><div class="field-label">Вид препятствий</div><div class="choice-grid three" id="obstacleChoices"></div></div>
             <div class="field"><label class="field-label" for="obstacleColor">Цвет препятствий</label><div class="swatch-field"><input type="color" id="obstacleColor" data-field="obstacleColor" /><span class="hex" data-hex="obstacleColor"></span></div></div>
           </div>
-          <div class="simple-note">Физика и управление уже настроены. Лишние эффекты не добавляются в код игры.</div>
+          <div class="simple-note">Плавный полёт, удобный пролёт и простой код уже предусмотрены.</div>
         </div>
       </section>
 
@@ -214,7 +214,7 @@
         <section class="panel">
           <div class="preview-head"><h2>Превью игры</h2><span class="live">Live preview</span></div>
           <div class="screen"><canvas id="preview" width="900" height="500" aria-label="Анимированный предпросмотр мира игры"></canvas></div>
-          <div class="screen-caption">✦ Нажми на превью, чтобы герой подпрыгнул</div>
+          <div class="screen-caption">✦ Превью можно играть: клик / тап / пробел</div>
         </section>
         <section class="panel" id="outputSection">
           <div class="output-head"><h2>Короткий промпт</h2><span class="prompt-len" id="promptLength"></span></div>
@@ -238,7 +238,7 @@
       obstacleWidth: 90, scoreRule: 'pass'
     };
     // Игровая механика зафиксирована, чтобы конструктор оставался простым.
-    const GAME = Object.freeze({gravity: 0.25, jumpForce: -5.0, speed: 2.5, interval: 120});
+    const GAME = Object.freeze({gravity: 0.20, jumpForce: -4.6, speed: 1.8, interval: 155, gap: 240, width: 70, maxFall: 4.5, hitRadius: 15});
 
     const heroOptions = [
       ['spider','🕷️','Паук','Spider-Man','#f44356','#2477d7'],
@@ -377,32 +377,37 @@
 
     function buildPrompt(s) {
       const where = {
-        london:'Лондон и силуэт Биг-Бена', space:'космос с планетами',
-        jungle:'джунгли',cyber:'ночной неоновый город',sea:'подводный мир'
+        london:'Лондон, Биг-Бен и силуэты домов', space:'космос с планетами',
+        jungle:'зелёные джунгли', cyber:'ночной неоновый город', sea:'подводный мир'
       }[s.world];
       const obstacle = {
-        spiked:'простые вертикальные трубы с треугольными шипами',
-        pipes:'простые прямоугольные трубы',
-        lasers:'простые светящиеся вертикальные барьеры'
+        spiked:'вертикальные трубы с чётко видимыми треугольными шипами',
+        pipes:'простые объёмные трубы',
+        lasers:'вертикальные светящиеся лазерные барьеры'
       }[s.obstacle];
       const style = {
-        cartoon:'мультяшная геометрия', pixel:'крупный пиксель-арт',
-        neon:'упрощённый неоновый стиль'
+        cartoon:'выразительная мультяшная рисовка',
+        pixel:'аккуратный пиксель-арт с чёткими пикселями',
+        neon:'контрастный неоновый рисунок'
       }[s.artStyle];
+      const details = {
+        spider:'Нарисуй узнаваемого Spider-Man во весь рост: красная маска с аккуратной сеткой паутины, два больших белых глаза с чёрной обводкой и бликами, красно-синий костюм, раздельные руки и ноги, маленькая эмблема паука на груди.',
+        bird:'Нарисуй птицу с крыльями, хвостиком, клювом и живыми глазами с бликами.',
+        cat:'Нарисуй кота с ушками, мордочкой, усами, лапами и выразительными глазами.',
+        robot:'Нарисуй компактного робота с корпусом, антенной, руками и светящимися глазами.',
+        dragon:'Нарисуй маленького дракона с рожками, крыльями, хвостом и выразительной мордочкой.'
+      }[s.hero] || 'Сделай героя узнаваемым и детальным.';
       return [
-        'Создай полностью рабочую мини-игру по мотивам Flappy Bird. Главное — простой и стабильный код, а не сложные эффекты.',
-        'Название: «' + (s.title.trim() || 'Моя игра') + '».',
-        'Герой: ' + s.heroName + '. ' + style + ', цвет ' + s.heroColor + '. Нарисуй простыми фигурами Canvas без картинок.',
-        'Фон: ' + where + '; ' + ({sunset:'закат',night:'ночь',day:'день'}[s.timeOfDay]) + '. Градиент и несколько статичных силуэтов.',
-        'Препятствия: ' + obstacle + ', цвет ' + s.obstacleColor + '. Движение справа налево; пролёт 205 px.',
-        'Canvas 900×500, адаптивный по ширине. Земля внизу.',
-        'Физика на 60 FPS: gravity 0.25, jumpForce -5.0, obstacleSpeed 2.5, obstacleInterval 120 кадров. Пробел, клик и тап подбрасывают героя; без нажатия он падает.',
-        'Столкновение с преградой или землёй — конец игры. Хитбокс персонажа уменьшен на 5 px. За каждый пройденный пролёт +1 очко только один раз.',
-        'Состояния: старт, игра, проигрыш. На старте название и кнопка «Играть», в игре крупный счёт, при проигрыше итоговый счёт и кнопка «Заново». Перезапуск сбрасывает все игровые данные.',
-        'Код: чистые HTML, CSS и JavaScript, встроенные <style> и <script>. Canvas 2D, один requestAnimationFrame, функции обновления, отрисовки и коллизий. Обработка клавиатуры и pointer. Предотврати прокрутку по пробелу и тапу.',
-        'Не используй библиотеки, внешние файлы и изображения, звуки, частицы, параллакс, дополнительные уровни и меню. Приоритет — надёжная механика.',
-        'Короткий читаемый код: ориентир 200–250 строк без минификации. Не упрощай столкновения, счёт и рестарт. Проверь синтаксис.',
-        'Ответ — ТОЛЬКО полный HTML-код для копирования в редактор (CodePen). Начни с <!DOCTYPE html> и закончи </html>. НЕ создавай файл. Без Markdown, пояснений и ссылок.'
+        'Создай простую, полностью рабочую и КОМФОРТНУЮ игру в стиле Flappy Bird. В приоритете играбельность, аккуратный герой и отсутствие ошибок.',
+        'Название: «' + (s.title.trim() || 'Моя игра') + '». Canvas 900×500, горизонтальный, адаптивное масштабирование.',
+        'Герой: ' + s.heroName + ', основной цвет ' + s.heroColor + ', дополнительный ' + s.heroAccent + '. ' + style + '. ' + details + ' Рисуй его отдельной функцией Canvas 2D с заливками, контурами и бликами. Не используй эмодзи, текстовые символы или один круг вместо персонажа. Размер героя около 48 px, лёгкий наклон по вертикальной скорости.',
+        'Фон: ' + where + ', ' + ({sunset:'розовый закат',night:'ночь',day:'день'}[s.timeOfDay]) + '. Простой градиент и несколько красивых силуэтов без тяжёлых эффектов.',
+        'Препятствия: ' + obstacle + ', цвет ' + s.obstacleColor + '. Ширина 70 px, широкий ПРОХОД 240 px, только движение справа налево. Без вертикального движения труб и резкого роста сложности.',
+        'ФИЗИКА (единицы на один кадр при 60 FPS): gravity=0.20, jumpForce=-4.6, obstacleSpeed=1.8, obstacleInterval=155 кадров; maxFallSpeed=4.5. На клик/тап/пробел строго ОДИН импульс vy=-4.6; каждый шаг vy=min(vy+gravity,4.5), y+=vy. Не применяй импульс несколько раз за один ввод. Ограничивай длительность кадра и используй фиксированный шаг 1/60 сек, чтобы скорость была одинаковой на мониторах 60/120/144 Гц.',
+        'Баланс: герой стартует в x=210, y=220; первая труба не ближе x=700; земля начинается на y=440. Верх прохода выбирай в диапазоне 95–155 px, без трудных скачков между соседними проходами. Хитбокс героя радиусом ~15 px, немного меньше рисунка. При касании потолка останови подъём и прижми героя к верхней границе, без проигрыша; столкновение с трубой или землёй = конец игры. Шипы визуальные: не расширяй ими хитбокс.',
+        'За каждый пройденный комплект труб +1 очко только один раз. Покажи крупный счёт. Экраны: старт с кнопкой «Играть»; проигрыш с результатом и «Заново». Перезапуск полностью сбрасывает y, vy, препятствия, счёт и таймеры. Управление: пробел, мышь, тап; предотврати прокрутку при игровом вводе.',
+        'Только чистый HTML, CSS и JavaScript с Canvas 2D, одним requestAnimationFrame и простыми функциями update/draw/collision. Без библиотек, внешних картинок, музыки, частиц, параллакса и меню. Код компактный (ориентир 250–350 читаемых строк), но не упрощай героя или столкновения. Проверь синтаксис и работу с клавиатурой/мышью/тачем.',
+        'Ответ — ТОЛЬКО полный HTML-КОД прямо в сообщении для вставки в редактор CodePen. Начни с <!DOCTYPE html>, закончи </html>. НЕ создавай файл. Никакого Markdown, пояснений или ссылок.'
       ].join('\n\n');
     }
 
@@ -619,56 +624,108 @@
       }
     }
     function drawSpider(g) {
-      const c=state.heroColor, a=state.heroAccent;
-      const style=state.artStyle;
-      const filledRound = (x,y,w,h,r,color) => {
-        g.fillStyle=color;g.beginPath();g.roundRect(x,y,w,h,r);g.fill();
-      };
-      const suit = style==='3d' ? g.createLinearGradient(-20,0,22,25) : a;
-      if(style==='3d'){suit.addColorStop(0,'#9ad6ff');suit.addColorStop(.32,a);suit.addColorStop(1,'#0a2559');}
-      filledRound(-21,7,42,23,12,suit);
-      const mask = style==='3d' ? g.createLinearGradient(-24,-22,25,26) : (style==='neon' ? '#301736' : c);
-      if(style==='3d'){mask.addColorStop(0,'#ffb5b1');mask.addColorStop(.27,c);mask.addColorStop(.78,c);mask.addColorStop(1,'#600e2e');}
-      g.fillStyle=mask;g.beginPath();g.ellipse(0,-3,23,27,0,0,Math.PI*2);g.fill();
-      g.strokeStyle=style==='neon' ? a : '#0b16338f';g.lineWidth=style==='vector'?2.5:1.7;
-      g.beginPath();g.moveTo(0,-26);g.lineTo(0,20);
-      for(let v=-13;v<=13;v+=13){g.moveTo(-21,v);g.quadraticCurveTo(0,v+8,21,v);}
-      g.stroke();
-      g.fillStyle=style==='neon'?'#baffff':'#f3f7ff';
-      g.beginPath();g.moveTo(-19,-11);g.quadraticCurveTo(-13,-18,-3,-8);g.quadraticCurveTo(-6,4,-18,1);g.closePath();g.fill();
-      g.beginPath();g.moveTo(19,-11);g.quadraticCurveTo(13,-18,3,-8);g.quadraticCurveTo(6,4,18,1);g.closePath();g.fill();
-      g.strokeStyle=style==='neon'?a:'#14213e';g.lineWidth=style==='vector'?3:2;g.stroke();
-      g.fillStyle='#ffffffdf';g.beginPath();g.arc(-11,-10,2.4,0,Math.PI*2);g.arc(11,-10,2.4,0,Math.PI*2);g.fill();
-      filledRound(-28,13,10,16,5,c);filledRound(18,13,10,16,5,c);
-      if(style==='3d'){
-        g.strokeStyle='#ffffffad';g.lineWidth=3;g.beginPath();g.arc(-5,-9,16,3.35,4.65);g.stroke();
-        const highlight=g.createRadialGradient(-13,-18,1,-7,-12,19);
-        highlight.addColorStop(0,'#ffffffb5');highlight.addColorStop(1,'#ffffff00');
-        g.fillStyle=highlight;g.beginPath();g.ellipse(-5,-7,18,22,-.2,0,Math.PI*2);g.fill();
-      } else if(style==='cartoon') {
-        g.strokeStyle='#511a32';g.lineWidth=3.2;g.beginPath();g.ellipse(0,-3,23,27,0,0,Math.PI*2);g.stroke();
-        g.strokeStyle='#ffffff7f';g.lineWidth=2.5;g.beginPath();g.arc(-7,-10,14,3.4,4.4);g.stroke();
-      } else if(style==='vector') {
-        g.strokeStyle='#ffffff';g.lineWidth=4;g.beginPath();g.moveTo(-20,26);g.lineTo(20,26);g.stroke();
+      const red=state.heroColor, blue=state.heroAccent;
+      g.save();
+      g.lineJoin='round';g.lineCap='round';
+      // Чёткий силуэт всего персонажа: ноги, корпус и руки.
+      g.fillStyle='#162a53';
+      roundLocal(-17,13,15,23,6,blue);roundLocal(2,13,15,23,6,blue);
+      roundLocal(-19,28,17,8,4,red);roundLocal(2,28,17,8,4,red);
+      roundLocal(-25,-1,12,29,6,blue);roundLocal(13,-1,12,29,6,blue);
+      roundLocal(-27,15,12,13,5,red);roundLocal(15,15,12,13,5,red);
+      roundLocal(-17,-4,34,26,9,blue);
+      // Красная грудная панель.
+      g.fillStyle=red;g.beginPath();g.moveTo(-13,-5);g.lineTo(13,-5);g.lineTo(9,14);g.lineTo(0,19);g.lineTo(-9,14);g.closePath();g.fill();
+      g.strokeStyle='#172441';g.lineWidth=1.6;g.stroke();
+      // Эмблема паука на груди.
+      g.strokeStyle='#15203b';g.lineWidth=1.6;
+      g.beginPath();g.ellipse(0,5,2.7,4,0,0,Math.PI*2);g.stroke();
+      for(const side of [-1,1]){
+        for(let i=0;i<3;i++){g.beginPath();g.moveTo(side*2,4+i*1.7);g.lineTo(side*(6+i),1+i*4);g.stroke();}
+      }
+      // Маска с объёмной окантовкой.
+      g.fillStyle='#17213b';g.beginPath();g.ellipse(0,-17,22.5,23.5,0,0,Math.PI*2);g.fill();
+      const mask=g.createLinearGradient(-18,-30,16,-2);
+      mask.addColorStop(0,'#ff8d96');mask.addColorStop(.30,red);mask.addColorStop(1,'#ad183d');
+      g.fillStyle=mask;g.beginPath();g.ellipse(0,-17,20.5,21.5,0,0,Math.PI*2);g.fill();
+      // Тонкая сетка паутины по маске.
+      g.strokeStyle='rgba(35,20,48,.48)';g.lineWidth=.8;
+      for(const vx of [-15,-7,0,7,15]){
+        g.beginPath();g.moveTo(vx*.55,-37);g.quadraticCurveTo(vx*1.05,-17,vx*.7,3);g.stroke();
+      }
+      for(const yy of [-29,-20,-10,-2]){
+        const w=19-Math.abs(yy+17)*.25;
+        g.beginPath();g.moveTo(-w,yy);g.quadraticCurveTo(0,yy+5,w,yy);g.stroke();
+      }
+      // Миндалевидные глаза с контрастным контуром и бликами.
+      for(const side of [-1,1]){
+        g.save();g.scale(side,1);
+        g.fillStyle='#101c32';g.beginPath();
+        g.moveTo(2,-24);g.quadraticCurveTo(8,-35,18,-29);
+        g.quadraticCurveTo(18,-13,5,-13);g.quadraticCurveTo(3,-18,2,-24);g.closePath();g.fill();
+        g.fillStyle='#f4fdff';g.beginPath();
+        g.moveTo(4,-24);g.quadraticCurveTo(9,-32,16,-27);
+        g.quadraticCurveTo(15,-16,6,-16);g.closePath();g.fill();
+        g.fillStyle='#fff';g.beginPath();g.ellipse(11,-25,2.2,3,0,0,Math.PI*2);g.fill();
+        g.restore();
+      }
+      // Небольшой блик по краю головы.
+      g.strokeStyle='rgba(255,222,230,.65)';g.lineWidth=1.6;
+      g.beginPath();g.ellipse(-5,-20,13.5,15,-.18,3.6,4.45);g.stroke();
+      g.restore();
+
+      function roundLocal(x,y,w,h,r,fill){
+        g.fillStyle=fill;g.beginPath();g.roundRect(x,y,w,h,r);g.fill();
+        g.lineWidth=1.5;g.strokeStyle='#172441';g.stroke();
       }
     }
     function drawHeroArt(g) {
-      if(state.hero==='spider') drawSpider(g);
-      else {
-        const style=state.artStyle;
-        let fill=state.heroColor;
-        if(style==='3d') {
-          fill=g.createRadialGradient(-12,-16,1,0,0,39);
-          fill.addColorStop(0,'#ffffff');fill.addColorStop(.15,state.heroColor);fill.addColorStop(1,state.heroAccent);
+      if(state.hero==='spider'){drawSpider(g);return;}
+      const c=state.heroColor, accent=state.heroAccent;
+      g.save();g.lineJoin='round';g.lineCap='round';g.lineWidth=2.2;g.strokeStyle='#20334d';
+      const ellipse=(x,y,rx,ry,fill)=>{
+        g.fillStyle=fill;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill();g.stroke();
+      };
+      const eyes=(y=0)=>{
+        for(const x of [-9,9]){
+          ellipse(x,y,5.5,7,'#fff');
+          g.fillStyle='#1b2839';g.beginPath();g.arc(x+1,y+1,2.6,0,Math.PI*2);g.fill();
+          g.fillStyle='#fff';g.beginPath();g.arc(x,y-2,1.5,0,Math.PI*2);g.fill();
         }
-        g.fillStyle=fill;g.beginPath();g.arc(0,0,26,0,Math.PI*2);g.fill();
-        g.lineWidth=style==='vector'?5:4;g.strokeStyle=state.heroAccent;g.stroke();
-        g.font='37px "Apple Color Emoji","Segoe UI Emoji",sans-serif';
-        g.textAlign='center';g.textBaseline='middle';
-        g.fillText((heroOptions.find(h=>h[0]===state.hero)||heroOptions[7])[1],0,1);
+      };
+      if(state.hero==='bird'){
+        g.fillStyle=accent;g.beginPath();g.moveTo(-18,7);g.lineTo(-34,-6);g.lineTo(-27,17);g.closePath();g.fill();
+        ellipse(0,1,25,23,c);ellipse(-9,8,13,9,accent);eyes(-9);
+        g.fillStyle='#f7a83f';g.beginPath();g.moveTo(20,1);g.lineTo(37,8);g.lineTo(20,13);g.closePath();g.fill();
+        g.fillStyle=c;g.beginPath();g.moveTo(-8,-19);g.lineTo(0,-30);g.lineTo(5,-19);g.closePath();g.fill();
+      }else if(state.hero==='cat'){
+        ellipse(0,11,21,20,accent);
+        g.fillStyle=c;
+        for(const side of [-1,1]){g.beginPath();g.moveTo(side*11,-18);g.lineTo(side*22,-35);g.lineTo(side*24,-9);g.closePath();g.fill();g.stroke();}
+        ellipse(0,-12,24,22,c);eyes(-13);
+        g.fillStyle='#f8c5c9';g.beginPath();g.moveTo(-4,1);g.lineTo(4,1);g.lineTo(0,5);g.closePath();g.fill();
+        g.strokeStyle='#fff6ec';g.lineWidth=1.6;
+        for(const side of [-1,1])for(const d of [-4,1,6]){g.beginPath();g.moveTo(side*6,4);g.lineTo(side*25,4+d);g.stroke();}
+      }else if(state.hero==='robot'){
+        g.fillStyle=accent;g.fillRect(-20,14,40,19);
+        g.fillStyle=c;g.beginPath();g.roundRect(-27,-23,54,43,9);g.fill();g.stroke();
+        g.fillStyle='#19334d';g.beginPath();g.roundRect(-21,-16,42,29,7);g.fill();
+        eyes(-3);
+        g.strokeStyle='#a9e9f1';g.lineWidth=3;g.beginPath();g.moveTo(0,-25);g.lineTo(0,-32);g.stroke();
+        ellipse(0,-34,4,4,'#7df3f3');
+        ellipse(-30,-1,5,12,accent);ellipse(30,-1,5,12,accent);
+      }else if(state.hero==='dragon'){
+        g.fillStyle=accent;g.beginPath();g.moveTo(-18,7);g.lineTo(-36,-16);g.lineTo(-28,16);g.closePath();g.fill();g.stroke();
+        ellipse(-2,9,22,21,c);
+        g.fillStyle=accent;
+        for(const x of [-18,-4,11]){g.beginPath();g.moveTo(x,-18);g.lineTo(x+5,-35);g.lineTo(x+12,-16);g.closePath();g.fill();g.stroke();}
+        ellipse(5,-10,22,19,c);eyes(-12);
+        ellipse(16,2,12,8,accent);
+        g.fillStyle='#17344a';g.beginPath();g.arc(20,0,1.8,0,Math.PI*2);g.fill();
       }
+      g.restore();
     }
-    // Два вспомогательных буфера позволяют превью показывать настоящий пиксель-арт.
+    // Два вспомогательных буфера    // Два вспомогательных буфера позволяют превью показывать настоящий пиксель-арт.
     const heroBuffer=document.createElement('canvas');heroBuffer.width=112;heroBuffer.height=112;
     const heroBufferCtx=heroBuffer.getContext('2d');
     const pixelBuffer=document.createElement('canvas');pixelBuffer.width=25;pixelBuffer.height=25;
@@ -729,36 +786,86 @@
         const g=ctx.createLinearGradient(0,240,0,GY);g.addColorStop(0,'#b6c7e000');g.addColorStop(1,'#b6c7e044');ctx.fillStyle=g;ctx.fillRect(0,240,CW,200);
       }
     }
-    function drawPreview(now) {
-      const dt=Math.min((now-lastFrame)/16.67||1,2); lastFrame=now;
-      phase+=dt;frame++;
+    // В превью используется та же облегчённая физика, что и в промпте.
+    const demo={mode:'ready',y:220,vy:0,score:0,frame:0,pipes:[],acc:0};
+    const HERO_X=210,GROUND_Y=440;
+    function resetDemo(start=false){
+      demo.mode=start?'play':'ready';
+      demo.y=220;demo.vy=0;demo.score=0;demo.frame=0;demo.acc=0;
+      demo.pipes=[
+        {x:700,top:120,passed:false},
+        {x:700+GAME.interval*GAME.speed,top:145,passed:false},
+        {x:700+2*GAME.interval*GAME.speed,top:100,passed:false}
+      ];
+      if(start) demo.vy=GAME.jumpForce;
+    }
+    function demoInput(){
+      if(demo.mode==='play')demo.vy=GAME.jumpForce;
+      else resetDemo(true);
+    }
+    function stepDemo(){
+      if(demo.mode!=='play')return;
+      demo.frame++;
+      demo.vy=Math.min(GAME.maxFall,demo.vy+GAME.gravity);
+      demo.y+=demo.vy;
+      if(demo.y<GAME.hitRadius+2){demo.y=GAME.hitRadius+2;demo.vy=0;}
+      for(const p of demo.pipes){
+        p.x-=GAME.speed;
+        if(!p.passed&&p.x+GAME.width<HERO_X-GAME.hitRadius){p.passed=true;demo.score++;}
+        const overlap=HERO_X+GAME.hitRadius>p.x&&HERO_X-GAME.hitRadius<p.x+GAME.width;
+        if(overlap&&(demo.y-GAME.hitRadius<p.top||demo.y+GAME.hitRadius>p.top+GAME.gap)){
+          demo.mode='over';
+        }
+      }
+      if(demo.y+GAME.hitRadius>=GROUND_Y)demo.mode='over';
+      demo.pipes=demo.pipes.filter(p=>p.x>-GAME.width-30);
+      const last=demo.pipes[demo.pipes.length-1];
+      if(last&&last.x<900+GAME.interval*GAME.speed){
+        const prevTop=last.top;
+        const nextTop=Math.max(95,Math.min(155,prevTop+((demo.frame%3)-1)*34));
+        demo.pipes.push({x:last.x+GAME.interval*GAME.speed,top:nextTop,passed:false});
+      }
+    }
+    function overlay(title,subtitle){
+      ctx.fillStyle='rgba(10,15,34,.57)';ctx.fillRect(0,0,CW,CH);
+      roundRect(247,149,406,156,25,'rgba(20,26,50,.9)');
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='#fff';ctx.font='800 37px system-ui,sans-serif';ctx.fillText(title,450,208);
+      ctx.font='600 19px system-ui,sans-serif';ctx.fillStyle='#c5d7ee';ctx.fillText(subtitle,450,261);
+    }
+    function drawPreview(now){
+      const dt=Math.min((now-lastFrame)/16.6667||1,3);lastFrame=now;
+      phase+=dt;demo.acc+=dt;
+      if(demo.mode==='play')while(demo.acc>=1){stepDemo();demo.acc-=1;}
+      else demo.acc=0;
       ctx.clearRect(0,0,CW,CH);
       sky();drawLandscape();drawWeather();
-      const spacing = Math.max(260,GAME.interval*GAME.speed*1.15);
-      const offset=(phase*GAME.speed*.95)%(spacing*3);
-      for(let i=0;i<4;i++) {
-        const x=620+i*spacing-offset+spacing;
-        if(x < -180 || x > CW+160) continue;
-        let gapTop=93+((i*67)%96);
-        if(state.obstacleMotion==='sway')gapTop+=Math.sin(phase*.018+i)*28;
-        if(state.obstacleMotion==='alternate')gapTop= i%2===0 ? 90 : 192;
-        drawObstacle(x,gapTop,state.gap,state.obstacleWidth);
-      }
+      for(const p of demo.pipes)drawObstacle(p.x,p.top,GAME.gap,GAME.width);
       drawGround();
-      flap*=Math.pow(.91,dt);
-      const yy=245+Math.sin(phase*.035)*13-flap;
-      drawHero(218,yy,clamp(Math.cos(phase*.035)*.18-flap*.006,-.5,.6));
-      const scoreX=CW/2;
-      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 43px system-ui,sans-serif';
-      ctx.lineWidth=6;ctx.strokeStyle='#15132c77';ctx.strokeText('005',scoreX,52);
-      ctx.fillStyle='#ffffff';ctx.fillText('005',scoreX,52);
+      const bob=demo.mode==='ready'?Math.sin(phase*.035)*7:0;
+      const tilt=demo.mode==='play'?clamp(demo.vy*.07,-.36,.5):-.05;
+      drawHero(HERO_X,demo.y+bob,tilt);
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.font='900 45px system-ui,sans-serif';ctx.lineWidth=6;
+      ctx.strokeStyle='#14172f9c';ctx.strokeText(String(demo.score),450,50);
+      ctx.fillStyle='#fff';ctx.fillText(String(demo.score),450,50);
+      if(demo.mode==='ready')overlay('Готов к полёту?','Нажми на игру или пробел');
+      if(demo.mode==='over')overlay('Игра окончена','Счёт: '+demo.score+' · Нажми, чтобы снова лететь');
       requestAnimationFrame(drawPreview);
     }
-    canvas.addEventListener('pointerdown', () => {flap=42;});
+    canvas.setAttribute('tabindex','0');
+    canvas.addEventListener('pointerdown',e=>{e.preventDefault();canvas.focus();demoInput();});
+    document.addEventListener('keydown',e=>{
+      if(e.code!=='Space')return;
+      const active=document.activeElement;
+      if(active&&['INPUT','TEXTAREA','SELECT','BUTTON'].includes(active.tagName))return;
+      e.preventDefault();demoInput();
+    });
+    resetDemo();
     refreshControls();
-    const prompt = buildPrompt(state);
-    document.getElementById('promptOutput').value = prompt;
-    document.getElementById('promptLength').textContent = `${prompt.length.toLocaleString('ru-RU')} знаков`;
+    const prompt=buildPrompt(state);
+    document.getElementById('promptOutput').value=prompt;
+    document.getElementById('promptLength').textContent=`${prompt.length.toLocaleString('ru-RU')} знаков`;
     requestAnimationFrame(drawPreview);
   </script>
 </body>
