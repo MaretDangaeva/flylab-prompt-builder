@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b1523">
-<title>FLYLAB BLOCKS — простой конструктор</title>
+<title>FLYLAB BLOCKS — Minecraft Adventure</title>
 <style>
 :root{color-scheme:dark;--bg:#0a1420;--panel:#15263a;--line:#35495d;--text:#f4f9fc;--muted:#98abbc;--mint:#8ee9b2;--yellow:#f3d47b;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 5% 0%,#17483c66,transparent 55%),radial-gradient(ellipse at 100% 5%,#1e3f6266,transparent 52%),var(--bg);color:var(--text);min-height:100vh}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--mint);outline-offset:3px}.wrap{width:min(1270px,calc(100% - 42px));margin:auto}.top{display:flex;justify-content:space-between;align-items:center;padding:27px 0 30px}.logo{font-weight:950;display:flex;align-items:center;gap:11px;font-size:25px;letter-spacing:-1.4px}.logo em{font-style:normal;color:var(--mint)}.logo-box{background:linear-gradient(140deg,#a4f6ba,#4dbd91);color:#173b31;border-radius:12px;display:grid;place-items:center;width:40px;height:40px;font-size:23px;box-shadow:0 6px 23px #7feeb33a}.tag{font-size:12px;font-weight:850;letter-spacing:1.5px;color:#92b6aa}.headline{padding:7px 0 27px}.eyebrow{color:var(--mint);font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.eyebrow:before{content:"";display:inline-block;width:7px;height:7px;margin-right:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint)}h1{letter-spacing:-2.9px;line-height:1.08;margin:12px 0 10px;font-size:clamp(34px,4.7vw,59px);font-weight:950}h1 span{color:var(--mint)}.subtitle{color:var(--muted);margin:0;font-size:14px}.layout{display:grid;grid-template-columns:1.03fr .97fr;gap:21px;align-items:start}.card{background:linear-gradient(145deg,#1a2b3f,#112034);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 52px #0005;overflow:hidden}.form{padding:27px}.cardhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:23px}.cardhead h2{font-size:21px;letter-spacing:-.5px;margin:0}.smallflag{font-size:11px;color:#96dcae;font-weight:900;padding:6px 10px;background:#5ec68a1b;border:1px solid #78dca14d;border-radius:10px;white-space:nowrap}.field{margin-bottom:23px}.field:last-of-type{margin-bottom:15px}.fieldlabel{font-size:13px;font-weight:850;color:#e4f0f7;display:block;margin-bottom:11px}.field input{width:100%;background:#0e1b2c;border:1px solid #3a4e65;color:#fff;border-radius:12px;padding:12px 14px;height:46px;outline:0}.field input:focus{border-color:var(--mint)}.choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.choices.three{grid-template-columns:repeat(3,minmax(0,1fr))}.choice{min-width:0;min-height:68px;background:#0d1d30;color:#bfcddd;border:1px solid #3a5065;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-weight:780;font-size:11px;padding:8px 4px;transition:background .15s,border .15s}.choice:hover{border-color:#a5e7ba}.choice[aria-pressed=true]{background:#4cae8127;border-color:var(--mint);color:#fff;box-shadow:inset 0 0 0 1px #83e1a349}.choice .emoji{font-size:23px;line-height:1.15}.colors{display:flex;gap:9px}.colorchoice{background:#0d1c2e;border:1px solid #3a5065;color:#c8d6e4;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 5px;font-weight:800;font-size:12px;border-radius:11px}.colorchoice[aria-pressed=true]{border-color:var(--mint);background:#4cae8127;color:#fff}.swatch{width:19px;height:19px;flex:none;border-radius:5px;background:var(--color);border:2px solid #ffffff30}.fixed{border-radius:13px;padding:15px;background:#102d32;border:1px solid #3a6d60;margin:23px 0 0}.fixed strong{display:block;font-size:13px;color:#9af1b7;margin-bottom:9px}.fixedrow{display:flex;gap:10px;flex-wrap:wrap;color:#d7e8e3;font-size:12px;font-weight:780}.fixedrow span{background:#ffffff0c;padding:5px 9px;border-radius:7px}.right{display:grid;gap:18px;position:sticky;top:18px}.previewcard,.promptcard{padding:18px}.righthead{display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:870;margin:0 1px 14px}.live{color:#8bebae;font-size:10px;font-weight:950;letter-spacing:1.2px}.live:before{content:"";display:inline-block;width:6px;height:6px;background:var(--mint);border-radius:50%;box-shadow:0 0 10px var(--mint);margin-right:7px}.canvasbox{border-radius:12px;overflow:hidden;border:1px solid #526273;background:#7bbb8a;line-height:0}.canvasbox canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated}.hint{font-size:11px;color:#8fa5b7;text-align:center;margin:12px 0 0}.promptcard textarea{display:block;width:100%;height:235px;resize:vertical;color:#d0e6ef;background:#0c1a2b;border:1px solid #354c64;border-radius:12px;padding:14px;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.count{font-size:11px;color:#93a7b9;font-weight:600}.copy{background:linear-gradient(95deg,#87ecaf,#eed078);border:0;border-radius:11px;min-height:46px;width:100%;font-size:13px;font-weight:930;color:#15342c;margin-top:11px}.copy:hover{filter:brightness(1.08)}.footer{padding:25px 0 35px;color:#8097ad;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:11px}@media(max-width:950px){.layout{grid-template-columns:1fr}.right{position:static;grid-template-columns:1fr 1fr;align-items:start}}@media(max-width:660px){.wrap{width:calc(100% - 24px)}.top{padding:18px 0 26px}.tag{display:none}.headline{padding-bottom:21px}h1{letter-spacing:-2px}.layout{gap:15px}.right{grid-template-columns:1fr;gap:15px}.form{padding:20px 15px}.cardhead{margin-bottom:20px}.choices{gap:6px}.choice{min-height:67px;font-size:10px}.previewcard,.promptcard{padding:14px}.footer{padding-top:19px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -12,18 +12,18 @@
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div class="logo"><div class="logo-box">▣</div>FLY<em>LAB</em><small style="font-size:12px;letter-spacing:.8px;color:#9ed6bb;margin-left:3px">BLOCKS</small></div><div class="tag">ПРОСТАЯ ВЕРСИЯ · V3</div></header>
-<section class="headline"><div class="eyebrow">Меньше настроек — проще код</div><h1>Собери игру.<br><span>Без лишнего.</span></h1><p class="subtitle">5 параметров → короткий промпт → рабочий HTML для CodePen.</p></section>
+<header class="top"><div class="logo"><div class="logo-box">▣</div>FLY<em>LAB</em><small style="font-size:12px;letter-spacing:.8px;color:#9ed6bb;margin-left:3px">BLOCKS</small></div><div class="tag">MINECRAFT BUILDER</div></header>
+<section class="headline"><div class="eyebrow">КОНСТРУКТОР ПРОМПТОВ</div><h1>Minecraft <span>Adventure</span></h1></section>
 <main class="layout"><section class="card form" aria-label="Настройки Minecraft-игры">
-<div class="cardhead"><h2>Настройки игры</h2><span class="smallflag">5 параметров</span></div>
+<div class="cardhead"><h2>Настройки игры</h2><span class="smallflag">◈ СВОЙ МИР</span></div>
 <div class="field"><label class="fieldlabel" for="gameTitle">Название</label><input id="gameTitle" maxlength="45" value="Minecraft Adventure" placeholder="Название игры"></div>
 <div class="field"><div class="fieldlabel">Мир</div><div id="worldChoices" class="choices" role="group" aria-label="Выбери мир"></div></div>
 <div class="field"><div class="fieldlabel">Что собираем?</div><div id="resourceChoices" class="choices three" role="group" aria-label="Выбери ресурсы"></div></div>
 <div class="field"><div class="fieldlabel">Какие враги?</div><div id="enemyChoices" class="choices three" role="group" aria-label="Выбери врагов"></div></div>
 <div class="field"><div class="fieldlabel">Цвет футболки</div><div id="shirtChoices" class="colors" role="group" aria-label="Выбери цвет"></div></div>
-<div class="fixed"><strong>✓ Остальное уже настроено</strong><div class="fixedrow"><span>🕹 WASD / стрелки</span><span>␣ Сбор</span><span>💎 6 ресурсов</span><span>👾 2 врага</span><span>❤️ 3 жизни</span><span>🏆 Победа / проигрыш</span></div></div>
+<div class="fixed"><strong>Игровые правила</strong><div class="fixedrow"><span>🕹 WASD / стрелки</span><span>␣ Сбор</span><span>💎 6 ресурсов</span><span>👾 2 врага</span><span>❤️ 3 жизни</span><span>🏆 Победа / проигрыш</span></div></div>
 </section>
-<aside class="right"><section class="card previewcard"><div class="righthead">Превью игры <span class="live">LIVE PREVIEW</span></div><div class="canvasbox"><canvas id="preview" width="800" height="450" aria-label="Предпросмотр блочного игрового мира"></canvas></div><p class="hint">Блочный 2D-мир · без сложного 3D</p></section>
+<aside class="right"><section class="card previewcard"><div class="righthead">Превью игры <span class="live">LIVE PREVIEW</span></div><div class="canvasbox"><canvas id="preview" width="800" height="450" aria-label="Предпросмотр блочного игрового мира"></canvas></div><p class="hint">Превью выбранного мира</p></section>
 <section class="card promptcard"><div class="righthead">Готовый промпт <span class="count" id="chars"></span></div><textarea id="prompt" readonly aria-label="Сгенерированный промпт"></textarea><button id="copy" class="copy" type="button">📋 Скопировать промпт</button></section></aside></main>
 <footer class="footer"><span>FLYLAB BLOCKS · Без регистрации и библиотек</span><span>Только HTML-код для CodePen, без файлов</span></footer>
 </div>
@@ -62,9 +62,9 @@ function promptText(){
   const title=state.title.trim()||'Minecraft Adventure';
   return `Создай простую законченную мини-игру в стиле Minecraft. Выведи ТОЛЬКО полный HTML-код для вставки в HTML-панель CodePen (CSS и JavaScript внутри этого HTML). Не создавай файл, не добавляй Markdown и пояснения.\n\n`+
   `Название: «${title}». Мир: ${worldName[state.world]}. Герой — кубический человечек с ${shirtAdjective[state.shirt]} футболкой. Ресурсы: только ${resourceName[state.resource]}. Враги: только ${enemyName[state.enemy]}.\n\n`+
-  `Сделай простую 2D-игру с видом сверху, без 3D, лучевого рендеринга и сложной камеры. Вся карта 16×9 клеток видна целиком. Блочная графика из прямоугольников в Canvas; игрок, деревья, камни и вода состоят из квадратов. Все горы и склоны только ступенчатые, без треугольников.\n\n`+
+  `Сделай надёжную 2D-игру с видом сверху, без 3D-движка и сложной камеры. Вся карта 16×9 клеток видна целиком. ВИЗУАЛ В СТИЛЕ MINECRAFT: выразительные псевдо-3D кубы с видимыми верхней и боковыми гранями, пиксельные текстуры травы, земли, камня, воды и дерева, освещение и тени. Персонаж со квадратной головой и блочным телом. Ступенчатые горы из каменных кубов, песчаные блоки или снежные кубы по выбранному биому. НЕ рисуй плоскую сетку разноцветных квадратов, треугольные горы или округлые холмы. Простой Canvas 2D и геометрические многоугольники без WebGL.\n\n`+
   `WASD/стрелки — ходьба по сетке, пробел — сбор стоящего рядом ресурса. 6 предметов случайно размещены на доступных клетках. За каждый +1 очко; собраны все 6 — экран «Победа!» и кнопка «Играть снова». 2 врага медленно ходят по доступным клеткам. При столкновении −1 здоровье; 3 здоровья изначально, 1 секунда защиты после удара. При нуле — «Игра окончена» и кнопка рестарта. Счёт и здоровье сверху. Стартовый экран с кнопкой «Начать игру».\n\n`+
-  `Технически: один Canvas, один цикл requestAnimationFrame, одна простая сетка, без библиотек, изображений, звуков, частиц и лишних эффектов. Корректные коллизии, ограничения карты, сбор без повторного счёта и полный сброс при рестарте. Управление не должно прокручивать страницу. Масштабируй Canvas под экран. Код короткий (ориентир до 350 строк), понятный, с проверенным синтаксисом. Отвечай исключительно HTML-кодом от <!DOCTYPE html> до </html>.`;
+  `Технически: один Canvas, один цикл requestAnimationFrame, одна простая сетка, без библиотек, изображений, звуков и сложных эффектов. Корректные коллизии, ограничения карты, сбор без повторного счёта и полный сброс при рестарте. Управление не должно прокручивать страницу. Масштабируй Canvas под экран. Код компактный (ориентир до 450 строк), понятный, с проверенным синтаксисом. Отвечай исключительно HTML-кодом от <!DOCTYPE html> до </html>.`;
 }
 function renderPrompt(){const text=promptText();$('prompt').value=text;$('chars').textContent=text.length.toLocaleString('ru-RU')+' знаков';}
 $('copy').addEventListener('click',async()=>{
@@ -74,58 +74,148 @@ $('copy').addEventListener('click',async()=>{
   b.textContent=ok?'✓ Скопировано':'Выделено — нажми Ctrl+C';setTimeout(()=>{b.textContent='📋 Скопировать промпт';},2200);
 });
 renderPrompt();
-// Лёгкое 2D-превью. Та же блочная стилистика, что запрашивается у генератора игры.
-const cv=$('preview'),c=cv.getContext('2d'),N=16,T=50,W=800,H=450;
-function block(x,y,w,h,color){c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));}
-function rnd(n){const z=Math.sin(n*112.4+24.3)*43758.5;return z-Math.floor(z);}
-function tile(x,y,t,theme){
-  const dark=theme==='Снег'?'#a7c4ce':theme==='Пустыня'?'#b78b4e':'#355c40';
-  const light=theme==='Снег'?'#f0faff':theme==='Пустыня'?'#ebca82':theme==='Горы'?'#77927d':'#62a36a';
-  block(x,y,T,T,light);block(x,y+T-7,T,7,dark);block(x,y,T,2,'#ffffff23');
-  if(t===1){ // дерево
-    block(x+22,y+24,11,18,'#76513b');block(x+8,y+7,35,27,theme==='Снег'?'#527f78':'#287b51');
-    block(x+14,y+1,26,11,theme==='Снег'?'#e6f5f9':'#3f9960');
-  }else if(t===2){ // камень
-    block(x+10,y+21,32,20,'#546675');block(x+10,y+15,32,9,'#8b9da9');block(x+33,y+21,9,20,'#657886');
-  }else if(t===3){ // вода
-    block(x+4,y+5,42,38,'#3d8dc7');block(x+4,y+5,42,7,'#6ac8f0');
-  }else if(t===4&&theme==='Пустыня'){
-    block(x+23,y+8,10,36,'#23895e');block(x+13,y+23,11,8,'#23895e');block(x+13,y+16,6,14,'#23895e');
-  }else if(t===5&&theme==='Горы'){
-    block(x+5,y+19,40,24,'#7d909b');block(x+12,y+8,27,13,'#b0bfc5');
+
+// Визуализация как в блочном песочном мире: псевдо-3D Canvas, без 3D-движка и изображений.
+const cv=$('preview'),c=cv.getContext('2d'),W=800,H=450;
+let T=0;
+const RI=(n)=>{let v=Math.sin(n*123.456+78.9)*42173.314;return v-Math.floor(v);};
+function rect(x,y,w,h,col){c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));}
+function quad(pts,col){c.fillStyle=col;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();}
+// A tile is a real looking voxel: top diamond and two darker sides, no triangle outlines.
+function voxel(x,y,w,h,d,top,left,right){
+ const p=[[x,y],[x+w/2,y+h/2],[x,y+h],[x-w/2,y+h/2]];
+ quad([p[3],p[2],[p[2][0],p[2][1]+d],[p[3][0],p[3][1]+d]],left);
+ quad([p[2],p[1],[p[1][0],p[1][1]+d],[p[2][0],p[2][1]+d]],right);
+ quad(p,top);
+}
+function pxcloud(x,y,size){let s=size;rect(x,y,92*s,16*s,'#ffffff');rect(x+19*s,y-18*s,54*s,19*s,'#ffffff');rect(x+43*s,y-30*s,31*s,17*s,'#ffffff');rect(x+8*s,y+16*s,77*s,7*s,'#d8ebfc');}
+function sky(world){
+ let top='#75b9f0',bottom='#d1f5ff';if(world==='Пустыня'){top='#eeac6e';bottom='#ffe3a2';}if(world==='Снег'){top='#83b8e4';bottom='#d9f4ff';}if(world==='Горы'){top='#75a6d4';bottom='#d9e6e9';}
+ const grad=c.createLinearGradient(0,0,0,290);grad.addColorStop(0,top);grad.addColorStop(1,bottom);rect(0,0,W,H,grad);
+ rect(672,35,44,44,world==='Снег'?'#fff9e0':'#fff0ab');rect(680,43,28,28,'#fff5cc');
+ let cloudMove=(T*.14)%1000;pxcloud(((98+cloudMove)%970)-115,54,.73);pxcloud(((415+cloudMove*.65)%970)-110,107,.52);
+ // Distant peaks are made of tiered squares, never triangular polygons.
+ if(world==='Горы'||world==='Снег'){
+  for(let k=0;k<3;k++){const base=210+k*270;
+   for(let row=0;row<6;row++){const width=(6-row)*24+40;
+    rect(base-width/2,260-row*19,width,19,(world==='Снег'&&row>=3)?'#f7ffff':row%2?'#8395a4':'#a6bac4');
+    if(row%2)rect(base-width/2+6,260-row*19+5,12,5,'#ffffff35');
+   }
   }
+ }else if(world==='Пустыня'){
+  for(let k=0;k<4;k++){const x=k*220-90;for(let row=0;row<4;row++)rect(x+row*17,266-row*13,170-row*34,13,row%2?'#d6a36c':'#e2b376');}
+ }else{
+  for(let k=0;k<13;k++){let x=k*72-38;rect(x,235-(k%3)*12,58,54,'#478768');rect(x+9,222-(k%3)*12,39,19,'#559975');}
+ }
 }
-function resource(x,y,t){const col=state.resource==='Алмазы'?'#73f5f1':state.resource==='Яблоки'?'#ed555c':'#f7d75a';
-  const sz=state.resource==='Яблоки'?18:16;block(x+25-sz/2,y+12+Math.sin(t/300+x)*2,sz,sz,col);block(x+21,y+13+Math.sin(t/300+x)*2,5,7,'#ffffff96');if(state.resource==='Яблоки')block(x+26,y+7,5,7,'#366e4c');
+function colors(b){return {
+ Лес:{top:'#65b65b',grass2:'#539f53',soil:'#84613b',soil2:'#62452e',rock:'#899399',tree:'#337e4d',tree2:'#5aa769',wood:'#83623d'},
+ Горы:{top:'#86aa83',grass2:'#6c926b',soil:'#73736e',soil2:'#555c5c',rock:'#899aa3',tree:'#46775b',tree2:'#629c6d',wood:'#876448'},
+ Пустыня:{top:'#ecd080',grass2:'#dbc07b',soil:'#c59a5a',soil2:'#a77a48',rock:'#bfac88',tree:'#3e9367',tree2:'#64b586',wood:'#957848'},
+ Снег:{top:'#f2fbff',grass2:'#dcecf3',soil:'#a8b6bd',soil2:'#82959e',rock:'#94a6af',tree:'#49766d',tree2:'#eafaff',wood:'#80644b'}
+ }[b];}
+function iso(i,j){return [330+(i-j)*25,79+(i+j)*11];}
+function ground(i,j,b,theme){
+ const [x,y]=iso(i,j),n=RI(i*77+j*41),water=(i===11&&j>=5&&j<=7)||(i===12&&j>=5&&j<=6);
+ let top=(n>.71)?theme.grass2:theme.top,left=theme.soil,right=theme.soil2;
+ if(b==='Горы'&&n>.87){top=theme.rock;left='#69767d';right='#505d66';}
+ if(water){top='#57bce7';left='#327cae';right='#1c659a';}
+ voxel(x,y,50,22,12,top,left,right);
+ // Blocky pixel texture on the visible top; dots deliberately sparse.
+ if(!water){rect(x-8,y+8,7,3,b==='Снег'?'#ffffff':b==='Пустыня'?'#ffeba8':'#b7e38b80');
+  if(n>.42)rect(x+6,y+12,6,3,b==='Горы'?'#d0d2cc65':b==='Снег'?'#f9feff':'#426e3c63');}
+ else{rect(x-5,y+9,17,3,'#b0eafa');rect(x-17,y+13,11,2,'#91dffa');}
 }
-function enemy(x,y){const col=state.enemy==='Зомби'?'#6ca86d':state.enemy==='Пауки'?'#31313e':'#d9e0dc';
-  if(state.enemy==='Пауки'){block(x+14,y+17,25,22,col);for(let k=0;k<3;k++){block(x+5,y+17+k*7,10,4,col);block(x+39,y+17+k*7,8,4,col);}block(x+18,y+20,5,5,'#e95870');block(x+28,y+20,5,5,'#e95870');}
-  else{block(x+14,y+8,26,22,col);block(x+12,y+28,30,14,state.enemy==='Зомби'?'#487fba':'#a7afb2');block(x+19,y+17,4,5,'#28313e');block(x+30,y+17,4,5,'#28313e');}
+function rock(i,j,b,scale=1){const[x,y]=iso(i,j),theme=colors(b),z=scale*12;voxel(x,y-18-z,37,17,22,theme.rock,'#6d7b85','#546774');
+ rect(x-6,y-15-z,5,3,'#ffffff72');rect(x+3,y-11-z,7,3,'#ffffff45');}
+function tree(i,j,b,scale=1){const[x,y]=iso(i,j);let t=colors(b),z=scale;
+ // Oak-like canopy made of stacked boxy leaves with light/shadow faces.
+ voxel(x,y-26*z,18*z,9*z,36*z,'#a7794b','#6b472e',t.wood);
+ voxel(x,y-76*z,64*z,29*z,37*z,t.tree2,t.tree,'#286442');
+ voxel(x-10*z,y-102*z,44*z,23*z,19*z,b==='Снег'?'#f8ffff':t.tree2,t.tree,b==='Снег'?'#b9dce0':'#397b4b');
+ if(b==='Снег'){rect(x-14*z,y-64*z,18*z,5*z,'#effbff');rect(x+3*z,y-84*z,12*z,4*z,'#faffff');}
+ else rect(x-18*z,y-57*z,8*z,5*z,'#dbef9c70');
 }
-function player(x,y){block(x+13,y+6,25,17,'#c3844c');block(x+14,y+16,24,18,'#e8b585');block(x+13,y+31,26,15,shirtColor[state.shirt]);block(x+18,y+21,4,4,'#232b39');block(x+30,y+21,4,4,'#232b39');}
-function draw(t){
-  const world=state.world;
-  const map=[
-   '0010000000200000','0000000000000000','0000000000001000','0000002000000000',
-   '0000000000000000','1000000000000000','0000000000000000','0000000000300000','0001000000000000'
-  ];
-  c.clearRect(0,0,W,H);
-  for(let y=0;y<9;y++)for(let x=0;x<16;x++){
-    let n=map[y][x]==='1'?1:map[y][x]==='2'?2:map[y][x]==='3'?3:0;
-    if(world==='Пустыня'&&n===1)n=4;
-    if(world==='Горы'&&rnd(x*99+y*39)>.91)n=5;
-    if(world==='Снег'&&n===1)n=1;
-    tile(x*T,y*T,n,world);
-    if(!n&&rnd(x*5+y*21)>.96)block(x*T+9,y*T+30,6,4,'#ffffff2b');
+function cactus(i,j){const[x,y]=iso(i,j);voxel(x,y-70,16,9,61,'#7bc288','#2f885c','#176745');
+ rect(x-24,y-46,18,13,'#2b9c60');rect(x-24,y-61,9,23,'#2b9c60');rect(x+10,y-33,18,11,'#2c8a5c');rect(x+19,y-53,9,23,'#2c8a5c');
+ rect(x-3,y-58,3,30,'#b0d7a75e');}
+function character(x,y,bob=0){
+ const skin='#eab48c',hair='#6d4a2e',shirt=shirtColor[state.shirt],boots='#2b3c62';
+ // Small shadow under the character, cast from the voxel feet.
+ c.globalAlpha=.24;rect(x-16,y+11,33,5,'#10221a');c.globalAlpha=1;
+ voxel(x-7,y-19+bob,15,8,16,'#5b6e96',boots,'#34466b');
+ voxel(x+9,y-17+bob,15,8,16,'#6f7ca1',boots,'#34466b');
+ voxel(x,y-44+bob,30,14,26,shirt,'#275b9b',shirt);
+ voxel(x-22,y-38+bob,10,8,21,shirt,'#3573ad',skin);
+ voxel(x+22,y-38+bob,10,8,21,shirt,'#3573ad',skin);
+ voxel(x,y-73+bob,36,16,28,hair,'#d59c75',skin);
+ // Pixelated eyes + nose on camera-facing side.
+ rect(x+1,y-54+bob,5,5,'#f8fafa');rect(x+10,y-50+bob,5,5,'#f8fafa');
+ rect(x+4,y-54+bob,3,5,'#243b50');rect(x+11,y-50+bob,3,5,'#243b50');
+ rect(x+7,y-42+bob,5,3,'#ac705b');
+}
+function enemy(x,y,bob=0){
+ const k=state.enemy;
+ if(k==='Пауки'){
+  for(let side of [-1,1])for(let i=0;i<3;i++)rect(x+side*(15+i*6),y-10+i*7+bob,18,5,'#22212d');
+  voxel(x,y-27+bob,45,19,21,'#444050','#24212b','#272333');rect(x+3,y-5+bob,6,6,'#ff555c');rect(x+12,y-1+bob,6,6,'#ff555c');
+ }else{
+  let skin=k==='Зомби'?'#83a55d':'#f3f0d9';let shirt=k==='Зомби'?'#5988a8':'#969aa0';
+  voxel(x-7,y-13+bob,12,7,14,'#515b65','#434452','#495768');voxel(x+7,y-13+bob,12,7,14,'#515b65','#434452','#495768');
+  voxel(x,y-38+bob,27,13,24,shirt,'#45607a','#334c6f');
+  voxel(x,y-66+bob,30,14,25,skin,k==='Зомби'?'#618b46':'#c5c5be',skin);
+  rect(x+2,y-49+bob,5,4,'#242833');rect(x+9,y-47+bob,5,4,'#242833');
+ }
+}
+function collectable(x,y,bob=0){
+ if(state.resource==='Алмазы'){
+  voxel(x,y-25+bob,25,12,18,'#b2fff5','#47bfc2','#2e8eac');rect(x-4,y-17+bob,5,5,'#f3ffff');rect(x+6,y-11+bob,4,4,'#bdfaff');
+ }else if(state.resource==='Золото'){
+  voxel(x,y-18+bob,26,13,12,'#fff07d','#d89f3e','#ecb948');rect(x+1,y-9+bob,9,3,'#fffbb4');
+ }else{
+  voxel(x,y-21+bob,22,10,20,'#ff6561','#ba3235','#e54b42');rect(x-2,y-31+bob,5,10,'#78512d');rect(x+3,y-29+bob,11,5,'#5db865');
+ }
+}
+function draw(t){T=t/16.67;const b=state.world,col=colors(b);sky(b);
+ // Soft vignette/illumination, no image assets.
+ const halo=c.createRadialGradient(655,98,0,655,98,200);halo.addColorStop(0,'#fff4c94b');halo.addColorStop(1,'#fff4c900');rect(475,0,325,270,halo);
+ // Shadow of the world, and side-row depth.
+ rect(125,341,613,78,'#0f2b3f15');
+ for(let depth=0;depth<24;depth++){
+  for(let i=0;i<16;i++){
+   const j=depth-i;if(j<0||j>=9)continue;
+   ground(i,j,b,col);
   }
-  resource(7*T,2*T,t);resource(4*T,6*T,t+150);resource(11*T,5*T,t+100);
-  enemy(12*T+Math.sin(t/1000)*17,3*T);enemy(2*T+Math.sin(t/1500)*8,7*T);
-  player(6*T,4*T+Math.sin(t/650)*3);
-  // Превью интерфейса в стиле будущей игры.
-  block(12,8,190,38,'#0b1d2ad9');c.textBaseline='middle';c.font='bold 20px system-ui';c.fillStyle='#f9fff9';c.fillText('♥ ♥ ♥    0 / 6',24,29);
-  requestAnimationFrame(draw);
+ }
+ // Place props in depth order; distant trees are visually behind the hero.
+ const props=[
+  {i:1,j:1,type:'tree'},{i:4,j:1,type:'tree'},{i:9,j:0,type:'tree'},
+  {i:14,j:1,type:'tree'},{i:15,j:6,type:'tree'},
+  {i:3,j:5,type:'tree'},{i:8,j:8,type:'tree'},
+  {i:2,j:7,type:'rock'},{i:11,j:2,type:'rock'},{i:5,j:2,type:'rock'},
+  {i:6,j:4,type:'loot'},{i:10,j:6,type:'loot'},
+  {i:8,j:4,type:'hero'},{i:13,j:3,type:'enemy'},{i:4,j:7,type:'enemy'}];
+ props.sort((a,b)=>(a.i+a.j)-(b.i+b.j));
+ props.forEach((p,index)=>{
+  const[x,y]=iso(p.i,p.j),bob=Math.sin(T*.07+index)*2;
+  if(p.type==='tree')b==='Пустыня'?cactus(p.i,p.j):tree(p.i,p.j,b,.83);
+  else if(p.type==='rock')rock(p.i,p.j,b);
+  else if(p.type==='loot')collectable(x,y,bob);
+  else if(p.type==='hero')character(x,y,bob);
+  else if(p.type==='enemy')enemy(x,y,bob);
+ });
+ // Pixel HUD overlay recalls Minecraft inventory slots rather than a plain number.
+ rect(14,13,179,39,'#10242abc');rect(14,13,179,3,'#d5f7f65c');
+ c.font='bold 18px system-ui';c.textBaseline='middle';c.fillStyle='#fff';c.fillText('♥ ♥ ♥',24,33);c.font='bold 15px system-ui';c.fillText('0 / 6',137,33);
+ const slots=5,sw=36,sx=301,sy=406;
+ rect(sx-6,sy-4,slots*sw+12,44,'#18242ba9');
+ for(let k=0;k<slots;k++){rect(sx+k*sw,sy,32,34,'#65737db2');rect(sx+k*sw+3,sy+3,26,28,'#303c42dd');}
+ rect(sx,sy,32,3,'#f6fbf5');rect(sx,sy,3,34,'#f6fbf5');
+ c.font='bold 18px system-ui';c.fillStyle='#b6fdff';c.fillText(state.resource==='Алмазы'?'◆':state.resource==='Яблоки'?'●':'▣',sx+11,sy+18);
+ requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
+
 })();
 </script>
 </body>
