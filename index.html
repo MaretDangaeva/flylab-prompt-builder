@@ -732,8 +732,8 @@
     const pixelBufferCtx=pixelBuffer.getContext('2d');
     function drawHero(x,y,tilt) {
       ctx.save();ctx.translate(x,y);ctx.rotate(tilt);
-      // Увеличение только в предпросмотре: стиль лучше различим на маленьком экране.
-      const scale=state.heroSize/35;ctx.scale(scale,scale);
+      // Масштаб персонажа согласован с маленьким хитбоксом превью.
+      const scale=state.heroSize/70;ctx.scale(scale,scale);
       const style=state.artStyle;
       if(style==='cartoon'||style==='neon'||style==='3d') {
         for(let i=1;i<5;i++) {
