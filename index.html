@@ -158,6 +158,18 @@
       .cols { gap: 10px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  
+    .simple-settings { padding: 25px 26px 23px; }
+    .setting-group { padding: 0 0 19px; margin: 0 0 23px; border-bottom: 1px solid var(--stroke); }
+    .setting-group:last-of-type { border-bottom: 0; margin-bottom: 0; padding-bottom: 2px; }
+    .simple-section-title { display:flex; align-items:center; gap: 12px; margin-bottom: 20px; }
+    .simple-section-title > span { display: grid; place-items:center; font-size: 11px; font-weight: 900; width: 31px; height: 31px; border-radius: 10px; background:#a28aff25; color:#e3d6ff; border:1px solid #9882db70; }
+    .simple-section-title h2 { font-size: 19px; }
+    .simple-note { padding: 14px 16px; font-size: 12px; line-height: 1.55; color: #b2c1d9; background: #0b172ca8; border-radius: 12px; }
+    .choice-grid.style-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .setting-group .field { margin-bottom: 18px; }
+    .setting-group .field:last-child { margin-bottom: 0; }
+    @media (max-width: 630px) { .simple-settings { padding: 20px 16px; } .choice-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
   </style>
 </head>
 <body>
@@ -169,59 +181,33 @@
 
     <div class="heading">
       <div class="eyebrow">Собери свою игру</div>
-      <h1>Твоя идея. <em>Твой промпт.</em></h1>
-      <p class="subline">Выбирай настройки → смотри превью → копируй готовое ТЗ.</p>
+      <h1>Меньше настроек. <em>Больше игры.</em></h1>
+      <p class="subline">8 простых настроек → короткий промпт → HTML-код для редактора.</p>
     </div>
 
     <div class="workspace">
       <section class="panel" aria-label="Настройки игры">
-        <nav class="tabs" aria-label="Разделы конструктора">
-          <button type="button" class="tab active" data-tab="hero" aria-selected="true"><span>🦸</span> Герой</button>
-          <button type="button" class="tab" data-tab="world" aria-selected="false"><span>🌆</span> Мир</button>
-          <button type="button" class="tab" data-tab="obstacles" aria-selected="false"><span>🚧</span> Преграды</button>
-        </nav>
 
-        <div class="tab-panel active" id="panel-hero" role="tabpanel">
-          <div class="panel-top"><h2>Кто летит?</h2><span class="count">01 / 03</span></div>
-          <div class="field"><label class="field-label" for="title">Название игры</label><input id="title" data-field="title" class="form-input" maxlength="65" placeholder="Название игры" /></div>
-          <div class="field"><div class="field-label">Главный герой</div><div class="choice-grid" id="heroChoices"></div></div>
-          <div class="field"><label class="field-label" for="heroName">Имя / описание героя</label><input id="heroName" data-field="heroName" class="form-input" maxlength="100" placeholder="Например, Человек-паук" /></div>
-          <div class="cols">
-            <div class="field"><label class="field-label" for="heroColor">Основной цвет</label><div class="swatch-field"><input type="color" id="heroColor" data-field="heroColor" /><span class="hex" data-hex="heroColor"></span></div></div>
-            <div class="field"><label class="field-label" for="heroAccent">Доп. цвет</label><div class="swatch-field"><input type="color" id="heroAccent" data-field="heroAccent" /><span class="hex" data-hex="heroAccent"></span></div></div>
+        <div class="simple-settings">
+          <div class="setting-group">
+            <div class="simple-section-title"><span>01</span><h2>Герой</h2></div>
+            <div class="field"><label class="field-label" for="title">Название игры</label><input id="title" data-field="title" class="form-input" maxlength="48" placeholder="Название игры" /></div>
+            <div class="field"><div class="field-label">Кто летит?</div><div class="choice-grid" id="heroChoices"></div></div>
+            <div class="field"><div class="field-label">Стиль рисунка</div><div class="choice-grid style-grid" id="styleChoices" role="group" aria-label="Стиль героя"></div></div>
+            <div class="field"><label class="field-label" for="heroColor">Цвет героя</label><div class="swatch-field"><input type="color" id="heroColor" data-field="heroColor" /><span class="hex" data-hex="heroColor"></span></div></div>
           </div>
-          <div class="field"><div class="field-label">Стиль героя</div><div class="choice-grid style-grid" id="styleChoices" role="group" aria-label="Стиль героя"></div></div>
-          <div class="field"><div class="slider-head"><label class="field-label" for="heroSize">Размер героя</label><output class="value" id="heroSizeVal"></output></div><input type="range" id="heroSize" data-field="heroSize" min="28" max="64" step="2" /><div class="slider-ends"><span>Маленький</span><span>Большой</span></div></div>
+          <div class="setting-group">
+            <div class="simple-section-title"><span>02</span><h2>Фон</h2></div>
+            <div class="field"><div class="field-label">Где летим?</div><div class="choice-grid" id="worldChoices"></div></div>
+            <div class="field"><label class="field-label" for="timeOfDay">Время суток</label><select id="timeOfDay" class="form-select" data-field="timeOfDay"><option value="sunset">Закат</option><option value="night">Ночь</option><option value="day">День</option></select></div>
+          </div>
+          <div class="setting-group">
+            <div class="simple-section-title"><span>03</span><h2>Препятствия</h2></div>
+            <div class="field"><div class="field-label">Вид препятствий</div><div class="choice-grid three" id="obstacleChoices"></div></div>
+            <div class="field"><label class="field-label" for="obstacleColor">Цвет препятствий</label><div class="swatch-field"><input type="color" id="obstacleColor" data-field="obstacleColor" /><span class="hex" data-hex="obstacleColor"></span></div></div>
+          </div>
+          <div class="simple-note">Физика и управление уже настроены. Лишние эффекты не добавляются в код игры.</div>
         </div>
-
-        <div class="tab-panel" id="panel-world" role="tabpanel">
-          <div class="panel-top"><h2>Где происходит игра?</h2><span class="count">02 / 03</span></div>
-          <div class="field"><div class="field-label">Локация</div><div class="choice-grid" id="worldChoices"></div></div>
-          <div class="cols">
-            <div class="field"><label class="field-label" for="timeOfDay">Время суток</label><select id="timeOfDay" class="form-select" data-field="timeOfDay"><option value="sunset">Розовый закат</option><option value="night">Глубокая ночь</option><option value="day">Яркий день</option><option value="dawn">Рассвет</option></select></div>
-            <div class="field"><label class="field-label" for="weather">Погода</label><select id="weather" class="form-select" data-field="weather"><option value="clear">Ясно</option><option value="stars">Мерцающие звёзды</option><option value="rain">Дождь</option><option value="snow">Снег</option><option value="fog">Туман</option></select></div>
-          </div>
-          <div class="cols">
-            <div class="field"><label class="field-label" for="ground">Поверхность</label><select id="ground" class="form-select" data-field="ground"><option value="asphalt">Асфальт</option><option value="grass">Трава</option><option value="sand">Песок</option><option value="water">Вода</option><option value="metal">Металл</option><option value="cloud">Облака</option></select></div>
-            <div class="field"><label class="field-label" for="palette">Палитра мира</label><select id="palette" class="form-select" data-field="palette"><option value="pink">Розовый + оранжевый</option><option value="blue">Синий + фиолетовый</option><option value="mint">Бирюза + индиго</option><option value="gold">Золото + бордо</option><option value="pastel">Пастельная</option></select></div>
-          </div>
-          <div class="field"><div class="field-label">Атмосфера</div><div class="toggle-grid"><button type="button" class="toggle" data-toggle="parallax">Движущийся фон</button><button type="button" class="toggle" data-toggle="stars">Блики / звёзды</button><button type="button" class="toggle" data-toggle="weatherFx">Частицы погоды</button><button type="button" class="toggle" data-toggle="sunGlow">Свечение неба</button></div></div>
-        </div>
-
-        <div class="tab-panel" id="panel-obstacles" role="tabpanel">
-          <div class="panel-top"><h2>Что мешает лететь?</h2><span class="count">03 / 03</span></div>
-          <div class="field"><div class="field-label">Тип преград</div><div class="choice-grid three" id="obstacleChoices"></div></div>
-          <div class="cols">
-            <div class="field"><label class="field-label" for="obstacleColor">Цвет преград</label><div class="swatch-field"><input type="color" id="obstacleColor" data-field="obstacleColor" /><span class="hex" data-hex="obstacleColor"></span></div></div>
-            <div class="field"><label class="field-label" for="obstacleMotion">Движение</label><select class="form-select" id="obstacleMotion" data-field="obstacleMotion"><option value="fixed">Без движения по Y</option><option value="sway">Плавно вверх-вниз</option><option value="alternate">Чередующиеся проходы</option></select></div>
-          </div>
-          <div class="cols">
-            <div class="field"><div class="slider-head"><label class="field-label" for="gap">Ширина пролёта</label><output class="value" id="gapVal"></output></div><input type="range" id="gap" data-field="gap" min="145" max="270" step="5" /><div class="slider-ends"><span>Сложнее</span><span>Проще</span></div></div>
-            <div class="field"><div class="slider-head"><label class="field-label" for="obstacleWidth">Толщина</label><output class="value" id="obstacleWidthVal"></output></div><input type="range" id="obstacleWidth" data-field="obstacleWidth" min="50" max="140" step="5" /><div class="slider-ends"><span>Узкие</span><span>Широкие</span></div></div>
-          </div>
-          <div class="field"><label class="field-label" for="scoreRule">Начисление очков</label><select class="form-select" id="scoreRule" data-field="scoreRule"><option value="pass">+1 за пройденный пролёт</option><option value="collect">+1 за монету в пролёте</option><option value="passBonus">+1 за пролёт, бонус за серию</option></select></div>
-        </div>
-
       </section>
 
       <aside class="right" aria-label="Предпросмотр и итоговый промпт">
@@ -231,7 +217,7 @@
           <div class="screen-caption">✦ Нажми на превью, чтобы герой подпрыгнул</div>
         </section>
         <section class="panel" id="outputSection">
-          <div class="output-head"><h2>Готовый промпт</h2><span class="prompt-len" id="promptLength"></span></div>
+          <div class="output-head"><h2>Короткий промпт</h2><span class="prompt-len" id="promptLength"></span></div>
           <textarea id="promptOutput" class="prompt-text" readonly aria-label="Сгенерированный промпт"></textarea>
           <div class="prompt-actions"><button type="button" class="copy" id="copyBtn">📋 Скопировать промпт</button></div>
         </section>
@@ -256,25 +242,18 @@
 
     const heroOptions = [
       ['spider','🕷️','Паук','Spider-Man','#f44356','#2477d7'],
-      ['bird','🐤','Птичка','Маленькая смелая птица','#ffcb48','#ff8d36'],
-      ['cat','🐱','Кот','Космический кот','#f5a45c','#ffecc4'],
+      ['bird','🐤','Птичка','Птичка','#ffcb48','#ff8d36'],
+      ['cat','🐱','Кот','Летающий кот','#f5a45c','#ffecc4'],
       ['robot','🤖','Робот','Летающий робот','#4fdcd5','#4e68e5'],
-      ['dragon','🐉','Дракон','Добрый маленький дракон','#67dc99','#4b79b9'],
-      ['astro','👩‍🚀','Астронавт','Маленький астронавт','#f2f5ff','#3a9cde'],
-      ['ghost','👻','Призрак','Весёлый призрак','#ece7ff','#a68ce5'],
-      ['custom','✏️','Свой','Мой уникальный персонаж','#f56e9c','#76c5f2']
+      ['dragon','🐉','Дракон','Маленький дракон','#67dc99','#4b79b9']
     ];
-    const styleOptions = [
-      ['cartoon','','Мультяшный'], ['pixel','','Пиксель'], ['neon','','Неон'],
-      ['vector','','Вектор'], ['3d','','3D']
-    ];
+    const styleOptions = [['cartoon','','Мультяшный'], ['pixel','','Пиксель'], ['neon','','Неон']];
     const worldOptions = [
-      ['london','🇬🇧','Лондон'], ['space','🪐','Космос'], ['jungle','🌿','Джунгли'], ['cyber','🌃','Киберпанк'],
-      ['sea','🐚','Океан'], ['desert','🏜️','Пустыня'], ['mountains','🏔️','Горы'], ['candy','🍭','Сказка']
+      ['london','🇬🇧','Лондон'], ['space','🪐','Космос'], ['jungle','🌿','Джунгли'],
+      ['cyber','🌃','Неоновый город'], ['sea','🐚','Океан']
     ];
     const obstacleOptions = [
-      ['spiked','🔺','Трубы с шипами'], ['pipes','🟩','Трубы'], ['lasers','⚡','Лазеры'],
-      ['towers','🏙️','Башни'], ['crystals','💎','Кристаллы'], ['vines','🌿','Лианы']
+      ['spiked','🔺','Шипы'], ['pipes','🟩','Трубы'], ['lasers','⚡','Лазеры']
     ];
     const labels = {
       hero: Object.fromEntries(heroOptions.map(x => [x[0],x[2]])),
@@ -293,12 +272,21 @@
     try {
       const stored = JSON.parse(localStorage.getItem('flylab-settings') || 'null');
       if (stored && typeof stored === 'object') {
-        for (const key of Object.keys(defaults)) {
+        for (const key of ['title','hero','heroColor','artStyle','world','timeOfDay','obstacle','obstacleColor']) {
           if (typeof stored[key] === typeof defaults[key]) state[key] = stored[key];
         }
       }
     } catch (_) { /* Локальное сохранение необязательно. */ }
 
+
+    // Старые сохранённые настройки не должны влиять на упрощённую версию.
+    for (const [key, opts] of [['hero',heroOptions],['artStyle',styleOptions],['world',worldOptions],['obstacle',obstacleOptions]]) {
+      if (!opts.some(item => item[0] === state[key])) state[key] = defaults[key];
+    }
+    if (!['sunset','night','day'].includes(state.timeOfDay)) state.timeOfDay = defaults.timeOfDay;
+    const selectedHero = heroOptions.find(x => x[0] === state.hero) || heroOptions[0];
+    state.heroName = selectedHero[3];
+    state.heroAccent = selectedHero[5];
     function renderOptionGroup(id, type, items) {
       const group = document.getElementById(id);
       items.forEach(item => {
@@ -388,37 +376,34 @@
     }
 
     function buildPrompt(s) {
-      const heroDetails = s.hero === 'spider'
-        ? 'маска, большие белые глаза с бликами, красно-синий костюм и узор паутины'
-        : s.hero === 'custom' ? 'уникальный узнаваемый силуэт и выразительные детали'
-        : 'чёткий силуэт, выразительная мимика и блики';
-      const worldDetails = {
-        london:'ночной Лондон, Биг-Бен и городской силуэт',
-        space:'планеты и космические станции', jungle:'слои тропического леса',
-        cyber:'неоновые небоскрёбы и вывески', sea:'подводные рифы и пузырьки',
-        desert:'барханы и скалы', mountains:'горные хребты и облака',
-        candy:'сказочная архитектура и необычные деревья'
+      const where = {
+        london:'Лондон и силуэт Биг-Бена', space:'космос с планетами',
+        jungle:'джунгли',cyber:'ночной неоновый город',sea:'подводный мир'
       }[s.world];
-      const obstacleDetails = {
-        spiked:'объёмные трубы с треугольными шипами в духе Geometry Dash',
-        pipes:'объёмные трубы', lasers:'светящиеся лазеры',
-        towers:'высокие башни', crystals:'острые кристаллы', vines:'лианы'
+      const obstacle = {
+        spiked:'простые вертикальные трубы с треугольными шипами',
+        pipes:'простые прямоугольные трубы',
+        lasers:'простые светящиеся вертикальные барьеры'
       }[s.obstacle];
-      const effects = [
-        s.parallax && 'параллакс', s.stars && 'мерцание звёзд',
-        s.weatherFx && s.weather !== 'clear' && 'анимация погоды',
-        s.sunGlow && 'свечение горизонта'
-      ].filter(Boolean).join(', ') || 'без дополнительных фоновых эффектов';
-      const artStyle = labels.artStyle[s.artStyle];
-      return `Ты разработчик браузерных игр. Создай красивую игру в духе Flappy Bird. Весь код — в одном HTML-документе со встроенными <style> и <script>, без библиотек и внешних ассетов.\n\n` +
-        `ИГРА: «${s.title.trim() || 'Моя игра'}». Canvas 900×500, адаптивный горизонтальный формат.\n` +
-        `ГЕРОЙ: ${s.heroName.trim() || labels.hero[s.hero]} (${labels.hero[s.hero]}). Стиль — ${artStyle}; действительно отрисуй персонажа именно в этом стиле, а не только назови его. ${heroDetails}. Цвета: ${s.heroColor} и ${s.heroAccent}. Размер ${s.heroSize} px, плавный наклон при полёте.\n` +
-        `МИР: ${worldDetails}. Время — ${labels.timeOfDay[s.timeOfDay]}, погода — ${labels.weather[s.weather]}, палитра — ${labels.palette[s.palette]}. Земля — ${labels.ground[s.ground]}. Эффекты: ${effects}. Фон анимированный, многослойный.\n` +
-        `ПРЕГРАДЫ: ${obstacleDetails}; цвет ${s.obstacleColor}, ширина ${s.obstacleWidth} px, пролёт ${s.gap} px. Движение справа налево; ${labels.obstacleMotion[s.obstacleMotion]}. Счёт: ${labels.scoreRule[s.scoreRule]}.\n\n` +
-        `МЕХАНИКА: пробел/клик/тап — импульс вверх, без нажатия — гравитация. Комфортная физика: gravity ${GAME.gravity}, jumpForce ${GAME.jumpForce.toFixed(1)}, obstacleSpeed ${GAME.speed}, obstacleInterval ${GAME.interval} кадров. Уменьшенный хитбокс; удар о преграду или землю завершает игру. Частицы при столкновении.\n` +
-        `ЭКРАНЫ: старт с названием и кнопкой «▶ Играть»; в игре крупный счёт по центру; при проигрыше затемнение, итоговый счёт, рекорд и кнопка «🔄 Заново».\n` +
-        `КОД: Canvas 2D, requestAnimationFrame, корректные коллизии, перезапуск, сохранение рекорда, поддержка телефона. Читаемый JavaScript с комментариями. Проверь синтаксис.\n\n` +
-        `ФОРМАТ ОТВЕТА: выведи ПРЯМО В СООБЩЕНИИ только полный рабочий HTML-код для копирования и вставки в HTML-редактор (например, CodePen). Первая строка — <!DOCTYPE html>, последняя — закрывающий тег html. Не создавай и не прикладывай файл. Не предлагай скачивание. Без Markdown-блоков, тройных кавычек, ссылок, вступления и пояснений — ТОЛЬКО КОД.`;
+      const style = {
+        cartoon:'мультяшная геометрия', pixel:'крупный пиксель-арт',
+        neon:'упрощённый неоновый стиль'
+      }[s.artStyle];
+      return [
+        'Создай полностью рабочую мини-игру по мотивам Flappy Bird. Главное — простой и стабильный код, а не сложные эффекты.',
+        'Название: «' + (s.title.trim() || 'Моя игра') + '».',
+        'Герой: ' + s.heroName + '. ' + style + ', цвет ' + s.heroColor + '. Нарисуй простыми фигурами Canvas без картинок.',
+        'Фон: ' + where + '; ' + ({sunset:'закат',night:'ночь',day:'день'}[s.timeOfDay]) + '. Градиент и несколько статичных силуэтов.',
+        'Препятствия: ' + obstacle + ', цвет ' + s.obstacleColor + '. Движение справа налево; пролёт 205 px.',
+        'Canvas 900×500, адаптивный по ширине. Земля внизу.',
+        'Физика на 60 FPS: gravity 0.25, jumpForce -5.0, obstacleSpeed 2.5, obstacleInterval 120 кадров. Пробел, клик и тап подбрасывают героя; без нажатия он падает.',
+        'Столкновение с преградой или землёй — конец игры. Хитбокс персонажа уменьшен на 5 px. За каждый пройденный пролёт +1 очко только один раз.',
+        'Состояния: старт, игра, проигрыш. На старте название и кнопка «Играть», в игре крупный счёт, при проигрыше итоговый счёт и кнопка «Заново». Перезапуск сбрасывает все игровые данные.',
+        'Код: чистые HTML, CSS и JavaScript, встроенные <style> и <script>. Canvas 2D, один requestAnimationFrame, функции обновления, отрисовки и коллизий. Обработка клавиатуры и pointer. Предотврати прокрутку по пробелу и тапу.',
+        'Не используй библиотеки, внешние файлы и изображения, звуки, частицы, параллакс, дополнительные уровни и меню. Приоритет — надёжная механика.',
+        'Короткий читаемый код: ориентир 200–250 строк без минификации. Не упрощай столкновения, счёт и рестарт. Проверь синтаксис.',
+        'Ответ — ТОЛЬКО полный HTML-код для копирования в редактор (CodePen). Начни с <!DOCTYPE html> и закончи </html>. НЕ создавай файл. Без Markdown, пояснений и ссылок.'
+      ].join('\n\n');
     }
 
     function changed(syncInputs = true) {
