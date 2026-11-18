@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minecraft Adventure</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#091923;color:white;font-family:system-ui,sans-serif}#shell{position:relative;width:min(100vw,980px);aspect-ratio:16/10;overflow:hidden;background:#89c7eb;border:4px solid #243f44;box-shadow:0 15px 45px #0008}canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-action:none}#hud{position:absolute;inset:13px 16px auto;display:none;justify-content:space-between;text-shadow:2px 2px #000;font-weight:900;font-size:clamp(12px,2vw,20px);pointer-events:none}#hud span{padding:6px 10px;background:#172f36aa;border:2px solid #ffffff50}#overlay{position:absolute;inset:0;background:#091b2db5;display:grid;place-items:center;text-align:center;padding:16px}#overlay .box{background:#112838e8;border:3px solid #d0f4ca;box-shadow:8px 8px 0 #06171bb0;padding:24px;max-width:430px;width:100%}h1{font-size:clamp(24px,5vw,42px);margin:0 0 10px;text-shadow:3px 4px #244c41}p{margin:8px 0 18px;color:#e0f1f1;line-height:1.45}button{font:800 16px system-ui;cursor:pointer;background:#7bd69a;color:#0b3425;border:3px solid #d5ffd6;box-shadow:4px 4px 0 #174d40;padding:12px 20px}#touch{display:none;position:absolute;inset:auto 12px 12px;justify-content:space-between;pointer-events:none}#touch button{pointer-events:auto;min-width:42px;padding:8px;opacity:.8;touch-action:none}#touch .move{display:grid;grid-template-columns:repeat(3,40px);gap:3px;align-items:center}#touch .move button:nth-child(1){grid-column:2}#touch .move button:nth-child(2){grid-column:1;grid-row:2}#touch .move button:nth-child(3){grid-column:2;grid-row:2}#touch .move button:nth-child(4){grid-column:3;grid-row:2}@media(pointer:coarse){#touch{display:flex}}@media(max-width:520px){#shell{border-width:2px}#overlay .box{padding:14px}#hud{inset:5px 5px auto;font-size:11px}#touch{inset:auto 5px 5px}#touch button{font-size:13px;min-width:35px;padding:6px}}
+</style>
+</head>
+<body>
+<div id="shell"><canvas id="game" width="800" height="500"></canvas><div id="hud"><span id="hp"></span><span id="score"></span></div><div id="overlay"><div class="box"><h1 id="head">Minecraft Adventure</h1><p id="desc">Исследуй мир, собери 6 ресурсов и избегай монстров.<br>W/S — вперёд/назад · A/D или ←/→ — поворот · Пробел — собрать.</p><button id="go">Начать игру</button></div></div><div id="touch"><div class="move"><button data-key="w">▲</button><button data-key="a">◀</button><button data-key="s">▼</button><button data-key="d">▶</button></div><button id="pick">СОБРАТЬ ◆</button></div></div>
+<script>
+(()=>{'use strict';
+const SETTINGS={"title": "Minecraft Adventure", "world": "forest", "resource": "Алмазы", "enemy": "Зомби", "shirt": "#4299f2"};document.title=SETTINGS.title;
+const C=document.getElementById('game'),g=C.getContext('2d'),W=800,H=500;
+const $=id=>document.getElementById(id),R=Math.random;
+const colors={forest:['#79bce9','#d9f3ff','#739d4b','#4b713e','#6e5c43'],mountain:['#7eb3d6','#d9eaf1','#8d9a83','#606f72','#72787e'],desert:['#efb76a','#ffe8b6','#d9ba72','#b48d56','#b98f54'],snow:['#86b8d9','#eefbff','#dce7ee','#a5b8c1','#c4d4db']}[SETTINGS.world];
+const mapN=15;let map=[],loot=[],mobs=[],player={x:2.5,y:2.5,a:0},health=3,score=0,mode='start',hurt=0,keys={},last=0,step=0;
+let screenText=''; let textures=[];
+function noise(i,j,s){let x=Math.sin(i*13.27+j*71.17+s*103.1)*43758.54;return x-Math.floor(x)}
+function makeTex(idx,base,bright,dark){let t=document.createElement('canvas');t.width=t.height=64;let c=t.getContext('2d');c.fillStyle=base;c.fillRect(0,0,64,64);for(let y=0;y<64;y+=8)for(let x=0;x<64;x+=8){let r=noise(x,y,idx);c.fillStyle=r>.76?bright:r<.34?dark:base;c.fillRect(x,y,8,8);if(r>.55){c.fillStyle='#ffffff16';c.fillRect(x,y,8,2)}}c.strokeStyle='#07161526';c.lineWidth=2;for(let y=0;y<64;y+=16){c.beginPath();c.moveTo(0,y);c.lineTo(64,y);c.stroke()}return t;}
+function buildTextures(){
+ const dirt=makeTex(0,SETTINGS.world==='snow'?'#8c99a5':SETTINGS.world==='desert'?'#caa46a':'#805b3b','#a98969','#5f442f');
+ let c=dirt.getContext('2d');c.fillStyle=SETTINGS.world==='snow'?'#f1fcff':SETTINGS.world==='desert'?'#efd18f':'#68ac50';c.fillRect(0,0,64,14);
+ for(let x=0;x<64;x+=8){c.fillStyle=SETTINGS.world==='snow'?'#d0e4e7':SETTINGS.world==='desert'?'#e2bf79':'#42793c';c.fillRect(x,14,8,3+(x/8%3)*2)}
+ const stone=makeTex(1,'#929ba0','#bbc1c3','#69777c'),wood=makeTex(2,'#79573c','#aa8559','#503925'),leaves=makeTex(3,'#3c8d53','#68b572','#275c3c');
+ c=leaves.getContext('2d');c.fillStyle='#74553e';c.fillRect(25,31,14,33);c.fillStyle='#a97d56';c.fillRect(29,31,4,30);
+ textures=[dirt,stone,wood,leaves];}
+
+function can(x,y){const i=Math.floor(x),j=Math.floor(y);return i>=1&&j>=1&&i<14&&j<14&&!map[j][i]}
+function randomFloor(except=[]){let choices=[];for(let j=1;j<14;j++)for(let i=1;i<14;i++)if(!map[j][i]&&Math.hypot(i+0.5-2.5,j+0.5-2.5)>2&& !except.some(p=>Math.hypot(p.x-i-.5,p.y-j-.5)<1.1))choices.push([i+.5,j+.5]);const p=choices[Math.floor(R()*choices.length)]||[7.5,7.5];return {x:p[0],y:p[1]}}
+function init(){buildTextures();map=Array.from({length:mapN},(_,j)=>Array.from({length:mapN},(_,i)=>i===0||j===0||i===14||j===14?1:0));
+ // A few isolated solid cubes; all 6 collectibles remain reachable through connected floor cells.
+ for(const [x,y,t] of [[5,3,1],[8,4,1],[4,8,2],[11,7,1],[8,11,2],[12,12,1],[6,6,3],[3,11,3],[11,3,3]])map[y][x]=t;
+ player={x:2.5,y:2.5,a:.25};loot=[];mobs=[];health=3;score=0;hurt=0;step=0;
+ for(let k=0;k<6;k++)loot.push({...randomFloor(loot),taken:false});
+ for(let k=0;k<2;k++)mobs.push({...randomFloor([...loot,...mobs]),cool:0,phase:k});
+ $('hp').textContent='♥ ♥ ♥';$('score').textContent='0 / 6 ◆';}
+function show(title,txt,btn){$('head').textContent=title;$('desc').textContent=txt;$('go').textContent=btn;$('overlay').style.display='grid';$('hud').style.display='none'}
+function start(){init();mode='playing';$('overlay').style.display='none';$('hud').style.display='flex';last=performance.now()}
+$('go').onclick=start;
+function keyName(k){if(k==='ArrowUp')return'w';if(k==='ArrowDown')return's';if(k==='ArrowLeft')return'a';if(k==='ArrowRight')return'd';return k.toLowerCase()}
+window.addEventListener('keydown',e=>{const k=keyName(e.key);if(['w','a','s','d',' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)||e.code==='Space')e.preventDefault();keys[k]=true;if((e.code==='Space'||k===' ')&&!e.repeat)pick();});
+window.addEventListener('keyup',e=>{keys[keyName(e.key)]=false});
+window.addEventListener('blur',()=>{keys={}});
+for(const b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();keys[b.dataset.key]=true;b.setPointerCapture(e.pointerId)});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys[b.dataset.key]=false)}
+$('pick').addEventListener('pointerdown',e=>{e.preventDefault();pick()});
+function pick(){if(mode!=='playing')return;let best=null,d=1.2;for(const p of loot){if(p.taken)continue;const q=Math.hypot(p.x-player.x,p.y-player.y);if(q<d){d=q;best=p}}if(best){best.taken=true;score++;$('score').textContent=score+' / 6 ◆';if(score===6){mode='won';show('Победа!','Собрано 6 / 6 ресурсов. Отличная работа!','Играть снова')}}}
+function update(dt){if(mode!=='playing')return;hurt=Math.max(0,hurt-dt);step+=dt*(keys.w||keys.s?8:2);
+ if(keys.a)player.a-=dt*1.8;if(keys.d)player.a+=dt*1.8;
+ let dir=(keys.w?1:0)-(keys.s?1:0);if(dir){const dx=Math.cos(player.a)*dt*dir*2.4,dy=Math.sin(player.a)*dt*dir*2.4;const pad=.19;const nx=player.x+dx,ny=player.y+dy;if(can(nx+Math.sign(dx)*pad,player.y)&&can(nx,player.y))player.x=nx;if(can(player.x,ny+Math.sign(dy)*pad)&&can(player.x,ny))player.y=ny}
+ for(const m of mobs){const dist=Math.hypot(m.x-player.x,m.y-player.y);if(dist<7&&dist>.8){const dx=(player.x-m.x)/dist*dt*.33,dy=(player.y-m.y)/dist*dt*.33;if(can(m.x+dx,m.y))m.x+=dx;if(can(m.x,m.y+dy))m.y+=dy}if(dist<.75&&hurt<=0){health--;hurt=1.5;$('hp').textContent=Array(health).fill('♥').join(' ');if(health<=0){mode='lost';show('Игра окончена','Собрано ресурсов: '+score+' / 6','Играть снова')}}}}
+function rr(x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h))}
+function sky(){const gr=g.createLinearGradient(0,0,0,270);gr.addColorStop(0,colors[0]);gr.addColorStop(1,colors[1]);g.fillStyle=gr;g.fillRect(0,0,W,260);rr(626,43,55,55,SETTINGS.world==='snow'?'#f4f5e8':'#fff2bc');rr(635,52,37,37,'#fff9db');for(let i=0;i<4;i++){let x=((i*290+step*.6)%(W+200))-100,y=85+i%2*50;rr(x,y,90,22,'#f8fcffcb');rr(x+20,y-17,43,19,'#f8fcffcb');rr(x+43,y-31,24,16,'#f8fcffcb')}}
+function floor(){
+ // Perspective floor-casting: square textures are sampled from world coordinates.
+ const fX=Math.cos(player.a),fY=Math.sin(player.a),pX=-fY*.7,pY=fX*.7;
+ const floorBase=colors[2];rr(0,250,W,H-250,floorBase);
+ for(let y=250;y<H;y+=5){const dist=210/(y-248),fog=Math.min(.62,dist/35);
+  for(let x=0;x<W;x+=5){const u=(x-W/2)/(W/2),wx=player.x+(fX+pX*u)*dist,wy=player.y+(fY+pY*u)*dist;
+   const cx=Math.floor(wx*3),cy=Math.floor(wy*3),n=noise(cx,cy,1);
+   let color=SETTINGS.world==='snow'?(n>.67?'#f6fdff':n<.30?'#cbdde2':'#e0edf0'):
+   SETTINGS.world==='desert'?(n>.65?'#f1d492':n<.28?'#caa267':'#e4bf7f'):
+   SETTINGS.world==='mountain'?(n>.70?'#a7af95':n<.30?'#667b67':'#82977b'):
+   n>.72?'#8eb762':n<.32?'#557f3d':'#74a34d';
+   rr(x,y,5,5,color);
+   if(fog>.2){g.fillStyle=`rgba(170,201,184,${fog*.16})`;g.fillRect(x,y,5,5)}
+  }
+ }
+}
+// Ray casting: voxel walls rendered from 4 procedurally painted pixel textures.
+const Z=new Float32Array(240),RAYS=240;
+function walls(){for(let i=0;i<RAYS;i++){
+ const ray=player.a+Math.atan((i-RAYS/2)/(RAYS*.78)),ca=Math.cos(ray),sa=Math.sin(ray);
+ let dist=.02,type=1,x,y;for(;dist<20;dist+=.035){x=player.x+ca*dist;y=player.y+sa*dist;const cx=Math.floor(x),cy=Math.floor(y);if(cx<0||cy<0||cx>=mapN||cy>=mapN||map[cy][cx]){type=map[cy]?.[cx]||1;break;}}
+ const corrected=Math.max(.07,dist*Math.cos(ray-player.a));Z[i]=corrected;
+ const height=Math.min(1000,285/corrected),top=250-height*.62;const w=W/RAYS+1;
+ const fx=x-Math.floor(x),fy=y-Math.floor(y);const edge=Math.min(fx,1-fx)<Math.min(fy,1-fy);let u=edge?fy:fx;
+ const shade=Math.max(.28,1-dist/17)*(edge?.84:1);
+ const texture=textures[(type-1)%textures.length];g.drawImage(texture,Math.floor(u*63),0,1,64,i*W/RAYS,top,w,height);
+ rr(i*W/RAYS,top,w,Math.max(2,height*.03),'#ffffff25');
+ rr(i*W/RAYS,top+height-3,w,3,'#050f1425');
+ if(dist>4){g.fillStyle=`rgba(36,58,65,${Math.min(.7,(dist-4)/17)})`;g.fillRect(i*W/RAYS,top,w,height)}
+ }}
+function sprite(type,p,time){const dx=p.x-player.x,dy=p.y-player.y,dist=Math.hypot(dx,dy);let angle=Math.atan2(dy,dx)-player.a;while(angle>Math.PI)angle-=2*Math.PI;while(angle< -Math.PI)angle+=2*Math.PI;
+ if(Math.abs(angle)>1.15||dist<.12)return;const cx=W/2+Math.tan(angle)*(RAYS*.78)*(W/RAYS),h=Math.min(440,245/dist),w=type==='enemy'?h*.54:h*.36;
+ if(cx<-w||cx>W+w)return;
+ const col=Math.max(0,Math.min(RAYS-1,Math.floor(cx/W*RAYS)));if(dist>Z[col]+.1)return;
+ const y=247-h*.5+Math.sin(time*2+p.phase||0)*2;
+ rr(cx-w/2+3,y+h*.9,w,h*.06,'#0f28165c');
+ if(type==='loot'){
+  const col=SETTINGS.resource==='Алмазы'?'#6dfff1':SETTINGS.resource==='Золото'?'#ffd45b':'#f76b5b';
+  rr(cx-w*.4,y+h*.28,w*.8,h*.48,col);rr(cx-w*.2,y+h*.16,w*.38,h*.2,'#f7ffffa7');rr(cx+w*.16,y+h*.28,w*.26,h*.48,'#193b4899');
+ }else{
+  const skin=SETTINGS.enemy==='Зомби'?'#78a665':SETTINGS.enemy==='Скелеты'?'#f1ead7':'#393246';
+  rr(cx-w*.24,y+h*.09,w*.48,h*.37,skin);rr(cx-w*.35,y+h*.48,w*.7,h*.29,SETTINGS.enemy==='Зомби'?'#5c84b1':SETTINGS.enemy==='Скелеты'?'#b6b7b1':'#343143');
+  rr(cx-w*.23,y+h*.76,w*.18,h*.22,'#363f65');rr(cx+w*.05,y+h*.76,w*.18,h*.22,'#363f65');
+  rr(cx-w*.16,y+h*.24,w*.1,h*.055,'#121e2e');rr(cx+w*.08,y+h*.24,w*.1,h*.055,'#121e2e');
+ }
+}
+function hand(){let bob=Math.sin(step*1.4)*5;rr(622,370+bob,135,119,SETTINGS.shirt);rr(606,345+bob,143,80,'#e5ad85');rr(616,353+bob,123,16,'#fbc89f');rr(725,428+bob,34,60,'#293f7c70')}
+function render(t){sky();floor();walls();const sprites=[...loot.filter(x=>!x.taken).map(x=>({...x,type:'loot',phase:0})),...mobs.map(x=>({...x,type:'enemy'}))].sort((a,b)=>Math.hypot(b.x-player.x,b.y-player.y)-Math.hypot(a.x-player.x,a.y-player.y));for(const s of sprites)sprite(s.type,s,t);hand();rr(W/2-10,246,20,3,'#fff');rr(W/2-1,237,3,20,'#fff');if(hurt>0){g.fillStyle=`rgba(255,35,35,${hurt*.17})`;g.fillRect(0,0,W,H)}}
+function loop(now){let dt=Math.min((now-last||now)/1000,.04);last=now;if(mode==='playing')update(dt);render(now*.001);requestAnimationFrame(loop)}
+init();show(SETTINGS.title,'Собери 6 ресурсов и избегай монстров. W/S — движение, A/D и стрелки — поворот, пробел — сбор.','Начать игру');requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
